@@ -142,12 +142,12 @@ select{-webkit-appearance:none;appearance:none;background-image:linear-gradient(
 .actions{display:flex;gap:10px;justify-content:flex-end;margin-top:10px;position:sticky;bottom:0;background:linear-gradient(180deg,rgba(28,24,32,0),#1c1820 30%);padding:12px 0 2px}
 .actions .btn{flex:1}
 @media (min-width:600px){.actions .btn{flex:none;min-width:120px}}
-.comp-row{display:grid;grid-template-columns:1fr 1fr 84px 36px;gap:6px;align-items:end;padding:8px;border:1px dashed var(--line);border-radius:10px;margin-bottom:8px}
+.comp-row{display:grid;grid-template-columns:1fr 1fr 36px;gap:6px;align-items:end;padding:8px;border:1px dashed var(--line);border-radius:10px;margin-bottom:8px}
 .comp-row input,.comp-row select{margin-top:0;font-size:15px;padding:8px 9px;min-height:40px}
-.comp-row .cn2{grid-column:1 / 3}
-.comp-row .cd{grid-column:3 / 5}
-.comp-row .full{grid-column:1 / 5}
-.comp-row .rm{grid-row:1;grid-column:4;height:40px;background:none;border:1px solid var(--line);border-radius:9px;color:var(--red);cursor:pointer}
+.comp-row .cn2{grid-column:1 / 2}
+.comp-row .cd{grid-column:2 / 4}
+.comp-row .full{grid-column:1 / 4}
+.comp-row .rm{grid-row:1;grid-column:3;height:40px;background:none;border:1px solid var(--line);border-radius:9px;color:var(--red);cursor:pointer}
 .subhead{display:flex;align-items:center;justify-content:space-between;margin:6px 0 8px;color:var(--gold2);font-size:14px}
 /* toolbar / list */
 .toolbar{position:sticky;top:var(--hh,61px);z-index:10;background:linear-gradient(180deg,var(--bg) 85%,rgba(15,12,16,0));padding:4px 0 10px;margin:-4px 0 4px}
@@ -156,7 +156,7 @@ select{-webkit-appearance:none;appearance:none;background-image:linear-gradient(
 .search input{padding-left:40px;margin-top:0;border-radius:12px}
 .filters{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
 .filters select{margin-top:0;font-size:14px;min-height:40px;padding:8px 26px 8px 10px}
-@media (min-width:880px){.filters{grid-template-columns:repeat(4,1fr)}}
+@media (min-width:880px){.filters{grid-template-columns:repeat(2,minmax(0,280px))}}
 .count{font-size:12.5px;color:var(--dim);margin:2px 4px 6px;display:flex;justify-content:space-between}
 /* detail */
 .back{display:inline-flex;align-items:center;gap:4px;color:var(--muted);text-decoration:none;font-size:14px;margin:0 0 10px}
@@ -238,6 +238,12 @@ select{-webkit-appearance:none;appearance:none;background-image:linear-gradient(
 .qa-list{max-height:48vh;overflow:auto;margin-top:8px}
 .qa-row{display:flex;align-items:center;gap:8px;padding:8px 2px;border-top:1px solid rgba(255,255,255,.06)}
 .qa-row .pm{cursor:default}
+details.more{border:1px solid var(--line);border-radius:12px;padding:0 12px;margin:2px 0 12px}
+details.more>summary{cursor:pointer;padding:12px 0;color:var(--gold2);font-weight:600;font-size:14px;list-style:none}
+details.more>summary::-webkit-details-marker{display:none}
+details.more>summary::before{content:'▸ '}details.more[open]>summary::before{content:'▾ '}
+details.more[open]{padding-bottom:4px}
+details.more .cnt{font-size:11px;font-weight:600;background:rgba(216,180,106,.15);border-radius:999px;padding:1px 7px;margin-left:4px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important}}
 </style>
 </head>
@@ -284,12 +290,11 @@ const K={meta:'patronbook.meta.v1',data:'patronbook.data.v1',enc:'patronbook.enc
 const PBKDF2_ITER=310000;
 const AAD='patronbook.v1';
 const PROPERTIES=['Nüwa','The Countdown','Morpheus','Grand Hyatt Macau'];
-const TIERS=['Premium Mass','VIP','Gold','Platinum','Diamond','Black'];
 const GAMES=['Baccarat','Blackjack','Roulette','Sic Bo','Dragon Tiger','Poker','Slots'];
 const ROOMS=['Deluxe King','Deluxe Twin','Suite','Villa','Sky Villa','Presidential Suite'];
 const COMP_TYPES=[['room','Room'],['fnb','F&B'],['spa','Spa'],['limo','Limo'],['flight','Flight'],['ferry','Ferry/Heli'],['gift','Gift'],['other','Other']];
 const COMP_LABEL=Object.fromEntries(COMP_TYPES);
-const CURS=['MOP','HKD'];
+const CUR='HKD';
 const CHANNELS=['Call','WhatsApp','WeChat','In person','Email','Other'];
 const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const MONL=['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -297,7 +302,7 @@ const WD=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const HAS_SUBTLE=!!(window.crypto&&crypto.subtle&&window.isSecureContext!==false);
 
 const S={meta:null,data:null,key:null,encInfo:null,unlocked:false,
-  list:{q:'',tier:'',tag:'',sort:'recent',minRoll:''},topPeriod:'month',lastActivity:Date.now(),hiddenAt:0,pending:0};
+  list:{q:'',tag:'',sort:'recent'},migrate:false,lastActivity:Date.now(),hiddenAt:0,pending:0};
 
 /* ============ Helpers ============ */
 const $=(s,r=document)=>r.querySelector(s);
@@ -318,15 +323,11 @@ const rel=s=>{const n=diffDays(today(),s);if(n===0)return 'today';if(n===1)retur
 const plural=(n,w)=>`${n} ${w}${n===1?'':'s'}`;
 
 /* money */
-const rate=()=>{const r=+((S.meta&&S.meta.settings.hkdRate)||1.03);return r>0?r:1.03};
-const toMOP=(v,c)=>(+v||0)*(c==='HKD'?rate():1);
-const dispCur=()=>(S.meta&&S.meta.settings.dispCur)==='HKD'?'HKD':'MOP';
-const fromMOP=v=>dispCur()==='HKD'?v/rate():v;
+/* HKD only (legacy MOP values are simply treated as HKD numbers) */
 const fmtNum=(v,dec=0)=>Number(v).toLocaleString('en-US',{maximumFractionDigits:dec,minimumFractionDigits:0});
 const compact=v=>{const a=Math.abs(v),s=v<0?'−':'';const f=(x,u)=>s+(x>=100?x.toFixed(0):x>=10?x.toFixed(1):x.toFixed(2)).replace(/\.0+$/,'').replace(/(\.\d*[1-9])0+$/,'$1')+u;
   if(a>=1e9)return f(a/1e9,'B');if(a>=1e6)return f(a/1e6,'M');if(a>=1e4)return f(a/1e3,'K');return s+fmtNum(Math.round(a))};
-const money=(vMOP,full)=>{const v=fromMOP(vMOP);return dispCur()+' '+(full?(v<0?'−':'')+fmtNum(Math.round(Math.abs(v))):compact(v))};
-const moneyIn=(v,c,full)=>`${c} ${full?(v<0?'−':'')+fmtNum(Math.abs(v),2):compact(v)}`;
+const money=(v,full)=>{v=+v||0;return CUR+' '+(full?(v<0?'−':'')+fmtNum(Math.round(Math.abs(v))):compact(v))};
 const pct=r=>r==null||!isFinite(r)?'—':(r*100).toFixed(r<0.1?2:1)+'%';
 function parseAmt(s){if(s==null)return null;if(typeof s==='number')return isFinite(s)?s:NaN;
   s=String(s).trim().replace(/[,\s_]/g,'').replace(/[−–—]/g,'-').replace(/^(MOP|HKD|HK\$|\$|MOP\$)/i,'').replace(/[萬万]$/,'w').toLowerCase();
@@ -402,7 +403,7 @@ async function encryptStr(key,salt,iter,plain){const iv=crypto.getRandomValues(n
 async function decryptBlob(key,blob){const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:b64d(blob.iv),additionalData:TE.encode(AAD)},key,b64d(blob.ct));return TD.decode(pt)}
 function parseBlob(raw){const b=JSON.parse(raw);if(!b||b.v!==1||!b.salt||!b.iv||!b.ct||!(b.iter>=1000))throw new Error('Encrypted data is damaged or in an unknown format.');return b}
 
-function defaultMeta(){return {v:1,settings:{hkdRate:1.03,dispCur:'MOP',defCur:'MOP',autoLock:5},pin:null,fail:{n:0,until:0},lastBackup:''}}
+function defaultMeta(){return {v:1,settings:{autoLock:5},pin:null,fail:{n:0,until:0},lastBackup:''}}
 function loadMeta(){let m=null;try{m=JSON.parse(localStorage.getItem(K.meta)||'null')}catch(e){m=null}
   const d=defaultMeta();if(!m||typeof m!=='object')m=d;
   m.settings=Object.assign(d.settings,m.settings||{});m.fail=Object.assign({n:0,until:0},m.fail||{});
@@ -411,8 +412,8 @@ function loadMeta(){let m=null;try{m=JSON.parse(localStorage.getItem(K.meta)||'n
   if(!m.pin&&localStorage.getItem(K.enc)&&!localStorage.getItem(K.data))m.pin={mode:'encrypt'};
   return m}
 function saveMeta(){try{localStorage.setItem(K.meta,JSON.stringify(S.meta))}catch(e){toast('Could not save settings: '+e.message,true)}}
-function emptyData(){return {v:1,patrons:[]}}
-function parseData(raw){const o=JSON.parse(raw);const arr=Array.isArray(o)?o:(o&&Array.isArray(o.patrons)?o.patrons:null);if(!arr)throw new Error('No patrons array found.');return {v:1,patrons:arr.map(normPatron)}}
+function emptyData(){return {v:2,patrons:[]}}
+function parseData(raw){const o=JSON.parse(raw);const arr=Array.isArray(o)?o:(o&&Array.isArray(o.patrons)?o.patrons:null);if(!arr)throw new Error('No patrons array found.');const from=Array.isArray(o)?1:(+o.v||1);if(from<2)S.migrate=true;return {v:2,patrons:arr.map(normPatron)}}
 function loadPlain(){const raw=localStorage.getItem(K.data);if(!raw)return emptyData();
   try{return parseData(raw)}catch(e){const k=K.data+'.corrupt-'+Date.now();try{localStorage.setItem(k,raw)}catch(_){}
     setTimeout(()=>toast('Stored data could not be read; a copy was kept under '+k,true),300);return emptyData()}}
@@ -433,11 +434,12 @@ window.addEventListener('beforeunload',e=>{if(S.pending>0){e.preventDefault();e.
 /* ============ Normalisation ============ */
 const str=(v,max=500)=>(typeof v==='string'?v:(v==null?'':String(v))).slice(0,max);
 const numOrNull=v=>{if(v==null||v==='')return null;const n=parseAmt(v);return Number.isFinite(n)?n:null};
-const curOf=v=>CURS.includes(v)?v:'MOP';
 const dateOf=v=>isDate(v)?v:'';
 const arrOf=v=>Array.isArray(v)?v:[];
-function normComp(c){c=c||{};return {id:str(c.id,40)||uid(),type:COMP_LABEL[c.type]?c.type:'other',value:numOrNull(c.value)||0,cur:curOf(c.cur),date:dateOf(c.date),note:str(c.note,500)}}
-function normVisit(v){v=v||{};return {id:str(v.id,40)||uid(),date:dateOf(v.date)||today(),endDate:dateOf(v.endDate),rolling:numOrNull(v.rolling),winloss:numOrNull(v.winloss),cur:curOf(v.cur),notes:str(v.notes,5000),comps:arrOf(v.comps).map(normComp).slice(0,200)}}
+/* legacy (pre-v2) fields such as tier / rolling / win-loss are kept untouched under .legacy so nothing is lost */
+function legacyOf(src,keys){const o={};const L=src.legacy&&typeof src.legacy==='object'?src.legacy:{};for(const k of keys){const v=src[k]!=null&&src[k]!==''?src[k]:L[k];if(v!=null&&v!=='')o[k]=typeof v==='number'?v:str(v,60)}return Object.keys(o).length?o:undefined}
+function normComp(c){c=c||{};return {id:str(c.id,40)||uid(),type:COMP_LABEL[c.type]?c.type:'other',value:numOrNull(c.value)||0,date:dateOf(c.date),note:str(c.note,500)}}
+function normVisit(v){v=v||{};return {id:str(v.id,40)||uid(),date:dateOf(v.date)||today(),endDate:dateOf(v.endDate),notes:str(v.notes,5000),comps:arrOf(v.comps).map(normComp).slice(0,200),legacy:legacyOf(v,['rolling','winloss','cur'])}}
 function normStay(s){s=s||{};const ci=dateOf(s.checkIn)||today();let co=dateOf(s.checkOut);if(co&&co<ci)co=ci;return {id:str(s.id,40)||uid(),property:str(s.property,120)||'Other',roomType:str(s.roomType,120),roomNo:str(s.roomNo,40),checkIn:ci,checkOut:co||ci,comp:str(s.comp,2000)}}
 function normContact(c){c=c||{};return {id:str(c.id,40)||uid(),date:dateOf(c.date)||today(),channel:str(c.channel,40),note:str(c.note,3000)}}
 function normPatron(p){p=p&&typeof p==='object'?p:{};const pr=p.prefs||{};
@@ -445,7 +447,7 @@ function normPatron(p){p=p&&typeof p==='object'?p:{};const pr=p.prefs||{};
   const tags=[...new Set((Array.isArray(p.tags)?p.tags:String(p.tags||'').split(',')).map(t=>str(t,40).trim()).filter(Boolean))].slice(0,30);
   let bd=str(p.birthday,10);if(!/^(\d{4})-\d{2}-\d{2}$/.test(bd)||!isDate(bd))bd='';
   return {id:str(p.id,40)||uid(),name:str(p.name,160).trim()||'(Unnamed)',cname:str(p.cname,80).trim(),nickname:str(p.nickname,80).trim(),phones,
-    whatsapp:str(p.whatsapp,40).trim(),wechat:str(p.wechat,80).trim(),email:str(p.email,160).trim(),tier:str(p.tier,40).trim(),birthday:bd,
+    whatsapp:str(p.whatsapp,40).trim(),wechat:str(p.wechat,80).trim(),email:str(p.email,160).trim(),birthday:bd,adt:(()=>{const n=numOrNull(p.adt);return n!=null&&n>=0?n:null})(),legacy:legacyOf(p,['tier']),
     prefs:{room:str(pr.room,200),bed:str(pr.bed,60),smoking:str(pr.smoking,40),food:str(pr.food,1000),games:str(pr.games,300),other:str(pr.other,2000)},
     notes:str(p.notes,20000),tags,followUp:dateOf(p.followUp),followUpNote:str(p.followUpNote,500),example:!!p.example,
     created:+p.created||Date.now(),updated:+p.updated||Date.now(),
@@ -454,19 +456,19 @@ function normPatron(p){p=p&&typeof p==='object'?p:{};const pr=p.prefs||{};
 /* ============ Stats ============ */
 const memo=new Map();
 function stats(p){let r=memo.get(p);if(r)return r;const t=today(),y12=addDays(t,-365),ym=t.slice(0,7),yy=t.slice(0,4);
-  r={rollAll:0,roll12:0,rollM:0,rollY:0,compAll:0,comp12:0,compM:0,compY:0,wlAll:0,wl12:0,hasWl:false,visits:p.visits.length,stays:p.stays.length,lastSeen:'',lastVisit:''};
-  for(const v of p.visits){const R=toMOP(v.rolling,v.cur),W=toMOP(v.winloss,v.cur);if(v.winloss!=null)r.hasWl=true;
-    r.rollAll+=R;r.wlAll+=W;if(v.date>=y12&&v.date<=t){r.roll12+=R;r.wl12+=W}if(v.date.slice(0,7)===ym)r.rollM+=R;if(v.date.slice(0,4)===yy)r.rollY+=R;
-    for(const c of v.comps){const d=c.date||v.date,C=toMOP(c.value,c.cur);r.compAll+=C;if(d>=y12&&d<=t)r.comp12+=C;if(d.slice(0,7)===ym)r.compM+=C;if(d.slice(0,4)===yy)r.compY+=C}
+  r={compAll:0,comp12:0,compM:0,compY:0,visitsM:0,visits:p.visits.length,stays:p.stays.length,lastSeen:'',lastVisit:''};
+  for(const v of p.visits){if(v.date.slice(0,7)===ym)r.visitsM++;
+    for(const c of v.comps){const d=c.date||v.date,C=+c.value||0;r.compAll+=C;if(d>=y12&&d<=t)r.comp12+=C;if(d.slice(0,7)===ym)r.compM+=C;if(d.slice(0,4)===yy)r.compY+=C}
     if(v.date<=t){const e=v.endDate&&v.endDate<t?v.endDate:(v.endDate?t:v.date);if(e>r.lastSeen)r.lastSeen=e;if(v.date>r.lastVisit)r.lastVisit=v.date}}
   for(const s of p.stays){if(s.checkIn<=t){const e=s.checkOut<t?s.checkOut:t;if(e>r.lastSeen)r.lastSeen=e}}
-  r.ratioAll=r.rollAll>0?r.compAll/r.rollAll:null;r.ratio12=r.roll12>0?r.comp12/r.roll12:null;
   memo.set(p,r);return r}
 const inHouseStay=(s,t)=>s.checkIn<=t&&s.checkOut>=t;
 function followState(p){if(!p.followUp)return null;const d=diffDays(today(),p.followUp);return {d,cls:d<0?'over':d===0?'today':'soon',label:d<0?`Overdue ${-d}d`:d===0?'Due today':d===1?'Tomorrow':`In ${d}d`}}
 function bdayInfo(p){if(!p.birthday)return null;const [y,m,d]=p.birthday.split('-').map(Number);return {y,m,d}}
+function ageOf(p){const b=bdayInfo(p);if(!b||!b.y)return null;const t=today(),[ty,tm,td]=t.split('-').map(Number);return ty-b.y-((tm<b.m||(tm===b.m&&td<b.d))?1:0)}
+const adtStr=(p,full)=>p.adt!=null?money(p.adt,full):'—';
 function initials(p){if(p.cname)return esc([...p.cname][0]);const w=p.name.replace(/[^\p{L}\s]/gu,'').trim().split(/\s+/);return esc(((w[0]||'?')[0]+(w.length>1?w[w.length-1][0]:'')).toUpperCase())}
-function tierBadge(t){if(!t)return '';const k=t.toLowerCase();let c='';if(k.includes('diamond'))c='t-dia';else if(k.includes('black'))c='t-blk';else if(k.includes('plat'))c='t-plat';else if(k.includes('gold'))c='t-gold';else if(k.includes('vip'))c='t-vip';else if(k.includes('mass'))c='t-mass';return `<span class="tier ${c}">${esc(t)}</span>`}
+
 const exBadge=p=>p.example?'<span class="exb">EXAMPLE</span>':'';
 const findP=id=>S.data.patrons.find(p=>p.id===id);
 function touch(p){p.updated=Date.now()}
@@ -474,9 +476,9 @@ function waNumber(p){const n=(p.whatsapp||p.phones[0]||'').replace(/[^\d]/g,'');
 function telHref(n){const c=n.replace(/[^\d+]/g,'');return c?'tel:'+c:''}
 /* ============ Views ============ */
 function pRow(p,right='',sub=''){const st=stats(p);
-  return `<div class="prow" role="link" tabindex="0" data-act="open" data-id="${esc(p.id)}"><div class="av">${initials(p)}</div><div class="pm"><div class="pn">${esc(p.name)}${p.cname?`<span class="cn">${esc(p.cname)}</span>`:''}${exBadge(p)}</div><div class="ps">${tierBadge(p.tier)}${sub}</div></div>${right?`<div class="pr">${right}</div>`:''}</div>`}
+  return `<div class="prow" role="link" tabindex="0" data-act="open" data-id="${esc(p.id)}"><div class="av">${initials(p)}</div><div class="pm"><div class="pn">${esc(p.name)}${p.cname?`<span class="cn">${esc(p.cname)}</span>`:''}${exBadge(p)}</div><div class="ps">${sub}</div></div>${right?`<div class="pr">${right}</div>`:''}</div>`}
 function emptyState(){return `<div class="card empty" id="emptyState"><div class="crest">◆</div><h2>Welcome to your Patron Book</h2>
- <p class="muted">A private, on-device book of your patrons, their visits, stays, rolling and comps. Nothing leaves this phone — no internet, no cloud.</p>
+ <p class="muted">A private, on-device book of your patrons, their visits, stays, comps and follow-ups. Nothing leaves this phone — no internet, no cloud.</p>
  <div class="btns"><button type="button" class="btn" data-act="newPatron">${I('plus')} Add first patron</button><button type="button" class="btn ghost" data-act="loadExample" id="loadExample">Load example data</button><button type="button" class="btn ghost" data-act="import">${I('up','sm')} Import backup</button></div></div>`}
 
 function vDashboard(){const ps=S.data.patrons;if(!ps.length)return emptyState();
@@ -489,9 +491,8 @@ function vDashboard(){const ps=S.data.patrons;if(!ps.length)return emptyState();
   const bdays=ps.map(p=>({p,b:bdayInfo(p)})).filter(x=>x.b&&x.b.m===curM).sort((a,b)=>a.b.d-b.b.d);
   const houseIds=new Set([...inHouse,...arrivals].map(x=>x.p.id));
   const lapsed=ps.map(p=>({p,st:stats(p)})).filter(x=>x.st.lastSeen&&diffDays(x.st.lastSeen,t)>=60&&!houseIds.has(x.p.id)).sort((a,b)=>a.st.lastSeen.localeCompare(b.st.lastSeen));
-  let rollM=0,compM=0;for(const p of ps){const s=stats(p);rollM+=s.rollM;compM+=s.compM}
-  const per=S.topPeriod;const key=per==='year'?'rollY':per==='12m'?'roll12':'rollM';const ckey=per==='year'?'compY':per==='12m'?'comp12':'compM';
-  const top=ps.map(p=>({p,st:stats(p)})).filter(x=>x.st[key]>0).sort((a,b)=>b.st[key]-a.st[key]).slice(0,8);
+  let visitsM=0,compM=0;for(const p of ps){const s=stats(p);visitsM+=s.visitsM;compM+=s.compM}
+  const top=ps.filter(p=>p.adt>0).sort((a,b)=>b.adt-a.adt||a.name.localeCompare(b.name)).slice(0,8);
   const fuRow=(x)=>pRow(x.p,`<button type="button" class="btn xs" data-act="contacted" data-id="${esc(x.p.id)}">${I('check','sm')} Contacted</button>`,
      `<span class="due ${x.f.cls}">${x.f.label}</span>${x.p.followUpNote?`<span class="dim">${esc(x.p.followUpNote)}</span>`:''}`);
   const d=new Date();
@@ -500,8 +501,8 @@ function vDashboard(){const ps=S.data.patrons;if(!ps.length)return emptyState();
    <div class="tile"><div class="v" id="tInHouse">${inHouse.length}</div><div class="l">In-house now</div></div>
    <div class="tile"><div class="v" id="tArrivals">${arrivals.length}</div><div class="l">Arrivals · 7 days</div></div>
    <div class="tile ${overdue.length+dueToday.length?'alert':''}"><div class="v" id="tFollow">${overdue.length+dueToday.length}</div><div class="l">Follow-ups due</div></div>
-   <div class="tile"><div class="v" id="tRollM">${money(rollM)}</div><div class="l">Rolling · ${MON[d.getMonth()]}</div></div>
-   <div class="tile"><div class="v" id="tCompM">${money(compM)}</div><div class="l">Comps · ${MON[d.getMonth()]} ${rollM>0?'· '+pct(compM/rollM):''}</div></div>
+   <div class="tile"><div class="v" id="tVisitsM">${visitsM}</div><div class="l">Visits · ${MON[d.getMonth()]}</div></div>
+   <div class="tile"><div class="v" id="tCompM">${money(compM)}</div><div class="l">Comps · ${MON[d.getMonth()]}</div></div>
   </div>
   <div class="grid two">
    <section class="card hl" id="secFollow"><h2 class="sec-t">${I('bell')} Follow-ups <span class="cnt">${overdue.length+dueToday.length+upcoming.length}</span></h2>
@@ -518,15 +519,14 @@ function vDashboard(){const ps=S.data.patrons;if(!ps.length)return emptyState();
     ${arrivals.map(x=>pRow(x.p,`<div>${esc(x.s.property)}</div><div class="dim">${diffDays(x.s.checkIn,x.s.checkOut)}n · ${esc(x.s.roomType||'')}</div>`,
       `<span class="pill up">${fmtDW(x.s.checkIn)} · ${rel(x.s.checkIn)}</span>`)).join('')||'<div class="empty-li">No arrivals in the next 7 days.</div>'}
    </section>
-   <section class="card" id="secTop"><h2 class="sec-t">${I('star')} Top by rolling <span class="right seg" role="group" aria-label="Period">
-     <button type="button" class="${per==='month'?'on':''}" data-act="topPeriod" data-v="month">Month</button><button type="button" class="${per==='year'?'on':''}" data-act="topPeriod" data-v="year">Year</button><button type="button" class="${per==='12m'?'on':''}" data-act="topPeriod" data-v="12m">12m</button></span></h2>
-    ${top.map((x,i)=>pRow(x.p,`<div class="big">${money(x.st[key])}</div><div class="dim">comps ${money(x.st[ckey])} · ${pct(x.st[key]?x.st[ckey]/x.st[key]:null)}</div>`)).join('').replace(/<div class="prow"/g,'<div class="prow top-row"')||'<div class="empty-li">No rolling recorded for this period.</div>'}
+   <section class="card" id="secTop"><h2 class="sec-t">${I('star')} Top patrons by ADT</h2>
+    ${top.map(p=>pRow(p,`<div class="big">${money(p.adt)}</div><div class="dim">ADT · comps 12m ${money(stats(p).comp12)}</div>`)).join('').replace(/<div class="prow"/g,'<div class="prow top-row"')||'<div class="empty-li">No ADT recorded yet — add it on a patron.</div>'}
    </section>
    <section class="card" id="secBday"><h2 class="sec-t">${I('cake')} Birthdays in ${MONL[curM-1]} <span class="cnt">${bdays.length}</span></h2>
     ${bdays.map(x=>{const dd=`${t.slice(0,4)}-${pad(x.b.m)}-${pad(x.b.d)}`;const n=diffDays(t,dd);return pRow(x.p,`<div>${x.b.d} ${MON[x.b.m-1]}</div><div class="dim">${n===0?'🎂 Today':n>0?rel(dd):'passed'}</div>`,x.b.y?`<span class="dim">turns ${+t.slice(0,4)-x.b.y}</span>`:'')}).join('')||'<div class="empty-li">No birthdays this month.</div>'}
    </section>
    <section class="card" id="secLapsed"><h2 class="sec-t">${I('moon')} Not seen 60+ days <span class="cnt">${lapsed.length}</span></h2>
-    ${lapsed.slice(0,12).map(x=>pRow(x.p,`<div>${diffDays(x.st.lastSeen,t)} days</div><div class="dim">since ${fmtD(x.st.lastSeen,true)}</div>`,x.st.roll12?`<span class="dim">12m ${money(x.st.roll12)}</span>`:'')).join('')||'<div class="empty-li">Everyone has visited recently.</div>'}
+    ${lapsed.slice(0,12).map(x=>pRow(x.p,`<div>${diffDays(x.st.lastSeen,t)} days</div><div class="dim">since ${fmtD(x.st.lastSeen,true)}</div>`,x.p.adt>0?`<span class="dim">ADT ${money(x.p.adt)}</span>`:'')).join('')||'<div class="empty-li">Everyone has visited recently.</div>'}
     ${lapsed.length>12?`<div class="empty-li">+${lapsed.length-12} more</div>`:''}
    </section>
   </div>
@@ -536,36 +536,29 @@ function backupReminder(){if(!S.data.patrons.some(p=>!p.example))return '';const
 
 /* ---- patron list ---- */
 function allTags(){const s=new Set();for(const p of S.data.patrons)p.tags.forEach(t=>s.add(t));return [...s].sort((a,b)=>a.localeCompare(b))}
-function allTiers(){const s=new Set(TIERS);for(const p of S.data.patrons)if(p.tier)s.add(p.tier);return [...s]}
 function vPatrons(){if(!S.data.patrons.length)return emptyState();const L=S.list;const opt=(v,l,cur)=>`<option value="${esc(v)}"${v===cur?' selected':''}>${esc(l)}</option>`;
   return `<div class="toolbar"><div class="search">${I('search')}<input id="q" type="search" placeholder="Search name, phone, tag, notes…" value="${esc(L.q)}" autocomplete="off" aria-label="Search patrons"></div>
    <div class="filters">
-    <select id="fTier" aria-label="Tier">${opt('','All tiers',L.tier)}${allTiers().map(t=>opt(t,t,L.tier)).join('')}</select>
     <select id="fTag" aria-label="Tag">${opt('','All tags',L.tag)}${allTags().map(t=>opt(t,'#'+t,L.tag)).join('')}</select>
-    <select id="fRoll" aria-label="Rolling filter">${[['','Any rolling (12m)'],['1e5','12m ≥ 100K'],['1e6','12m ≥ 1M'],['5e6','12m ≥ 5M'],['1e7','12m ≥ 10M'],['5e7','12m ≥ 50M'],['none','No rolling 12m']].map(o=>opt(o[0],o[1],L.minRoll)).join('')}</select>
-    <select id="fSort" aria-label="Sort">${[['recent','Sort: Last visit'],['name','Sort: Name A–Z'],['follow','Sort: Follow-up soonest'],['roll12','Sort: Rolling 12m'],['rollAll','Sort: Rolling all-time'],['tier','Sort: Tier']].map(o=>opt(o[0],o[1],L.sort)).join('')}</select>
+    <select id="fSort" aria-label="Sort">${[['recent','Sort: Last visit'],['name','Sort: Name A–Z'],['follow','Sort: Follow-up soonest'],['adt','Sort: ADT (highest)']].map(o=>opt(o[0],o[1],L.sort)).join('')}</select>
    </div></div><div class="count" id="plCount"></div><div class="card" style="padding:4px 10px"><div id="plist"></div></div>`}
-function searchText(p){return [p.name,p.cname,p.nickname,p.tier,p.email,p.wechat,p.whatsapp,...p.phones,...p.tags,p.notes,p.followUpNote,p.prefs.room,p.prefs.bed,p.prefs.smoking,p.prefs.food,p.prefs.games,p.prefs.other,
+function searchText(p){return [p.name,p.cname,p.nickname,p.email,p.wechat,p.whatsapp,...p.phones,...p.tags,p.notes,p.followUpNote,p.prefs.room,p.prefs.bed,p.prefs.smoking,p.prefs.food,p.prefs.games,p.prefs.other,
   ...p.visits.map(v=>v.notes+' '+v.comps.map(c=>c.note).join(' ')),...p.stays.map(s=>s.property+' '+s.roomNo+' '+s.roomType+' '+s.comp),...p.contacts.map(c=>c.note)].join('\n').toLowerCase()}
 function filteredPatrons(){const L=S.list,q=L.q.trim().toLowerCase(),qd=q.replace(/[^\d]/g,'');const t=today();
   const terms=q.split(/\s+/).filter(Boolean);
-  let arr=S.data.patrons.filter(p=>{if(L.tier&&p.tier!==L.tier)return false;if(L.tag&&!p.tags.includes(L.tag))return false;
-    if(L.minRoll){const r=stats(p).roll12;if(L.minRoll==='none'){if(r>0)return false}else if(fromMOP(r)<+L.minRoll)return false}
+  let arr=S.data.patrons.filter(p=>{if(L.tag&&!p.tags.includes(L.tag))return false;
     if(terms.length){const txt=searchText(p);const ok=terms.every(w=>txt.includes(w.replace(/^#/,'')));
       if(!ok){if(qd.length>=3&&p.phones.concat(p.whatsapp).some(n=>n.replace(/[^\d]/g,'').includes(qd)))return true;return false}}
     return true});
-  const tr=x=>{const i=TIERS.indexOf(x.tier);return i<0?-1:i};
   const sorters={name:(a,b)=>a.name.localeCompare(b.name),
     recent:(a,b)=>(stats(b).lastSeen||'').localeCompare(stats(a).lastSeen||'')||a.name.localeCompare(b.name),
     follow:(a,b)=>(a.followUp||'9999').localeCompare(b.followUp||'9999')||a.name.localeCompare(b.name),
-    roll12:(a,b)=>stats(b).roll12-stats(a).roll12||a.name.localeCompare(b.name),
-    rollAll:(a,b)=>stats(b).rollAll-stats(a).rollAll||a.name.localeCompare(b.name),
-    tier:(a,b)=>tr(b)-tr(a)||a.name.localeCompare(b.name)};
+    adt:(a,b)=>(b.adt==null?-1:b.adt)-(a.adt==null?-1:a.adt)||a.name.localeCompare(b.name)};
   return arr.sort(sorters[L.sort]||sorters.recent)}
 function renderList(){const el=$('#plist');if(!el)return;const arr=filteredPatrons(),L=S.list,t=today();
-  $('#plCount').innerHTML=`<span>${plural(arr.length,'patron')}${arr.length!==S.data.patrons.length?` of ${S.data.patrons.length}`:''}</span>${(L.q||L.tier||L.tag||L.minRoll)?'<button type="button" class="linkbtn tiny" data-act="clearFilters">Clear filters</button>':''}`;
+  $('#plCount').innerHTML=`<span>${plural(arr.length,'patron')}${arr.length!==S.data.patrons.length?` of ${S.data.patrons.length}`:''}</span>${(L.q||L.tag)?'<button type="button" class="linkbtn tiny" data-act="clearFilters">Clear filters</button>':''}`;
   el.innerHTML=arr.map(p=>{const st=stats(p),f=followState(p);let right;
-    if(L.sort==='roll12'||L.sort==='rollAll'||L.minRoll){const v=L.sort==='rollAll'?st.rollAll:st.roll12;right=`<div class="big">${money(v)}</div><div class="dim">${L.sort==='rollAll'?'all-time':'12 months'}</div>`}
+    if(L.sort==='adt')right=`<div class="big">${adtStr(p)}</div><div class="dim">ADT</div>`;
     else if(L.sort==='follow'&&f)right=`<span class="due ${f.cls}">${f.label}</span>`;
     else right=st.lastSeen?`<div>${fmtD(st.lastSeen)}</div><div class="dim">last seen</div>`:'<div class="dim">no visits</div>';
     const ih=p.stays.some(s=>inHouseStay(s,t));
@@ -581,12 +574,11 @@ function vDetail(p){const st=stats(p),f=followState(p),t=today();
     p.email?`<a class="cbtn" href="mailto:${esc(p.email)}">${I('mail','sm')} ${esc(p.email)}</a>`:''].join('');
   const tlItems=[...p.visits.map(v=>({k:'visit',d:v.date,o:v})),...p.stays.map(s=>({k:'stay',d:s.checkIn,o:s})),...p.contacts.map(c=>({k:'contact',d:c.date,o:c}))].sort((a,b)=>b.d.localeCompare(a.d)||(a.k==='stay'?-1:1));
   const bd=bdayInfo(p);const pr=p.prefs;const prefRows=[['Room',pr.room],['Bed',pr.bed],['Smoking',pr.smoking],['Games',pr.games],['Food & drinks',pr.food],['Other',pr.other]].filter(x=>x[1]);
-  const wlc=v=>v>0?'pos':v<0?'neg':'';
   return `<a class="back" href="#/patrons">${I('back','sm')} Patrons</a>
   <div class="grid two">
    <section class="card hl span2" id="detailHead">
     <div class="dh"><div class="av big">${initials(p)}</div><div style="min-width:0"><h1 id="dName">${esc(p.name)}${p.cname?` <span class="cn">${esc(p.cname)}</span>`:''}${exBadge(p)}</h1>
-     <div class="ps" style="margin-top:4px">${tierBadge(p.tier)}${p.nickname?`<span>“${esc(p.nickname)}”</span>`:''}${bd?`<span class="dim">${I('cake','sm')} ${bd.d} ${MON[bd.m-1]}${bd.y?' '+bd.y:''}</span>`:''}${p.stays.some(s=>inHouseStay(s,t))?'<span class="pill">In-house</span>':''}</div>
+     <div class="ps" style="margin-top:4px">${p.adt!=null?`<span class="tier" id="dAdt">ADT ${money(p.adt,true)}</span>`:''}${p.nickname?`<span>“${esc(p.nickname)}”</span>`:''}${bd?`<span class="dim" id="dDob">${I('cake','sm')} ${bd.d} ${MON[bd.m-1]}${bd.y?' '+bd.y+' · age '+ageOf(p):''}</span>`:''}${p.stays.some(s=>inHouseStay(s,t))?'<span class="pill">In-house</span>':''}</div>
      ${p.tags.length?`<div class="ps" style="margin-top:6px">${p.tags.map(x=>`<span class="tag">#${esc(x)}</span>`).join('')}</div>`:''}</div></div>
     ${contactBtns?`<div class="contact-btns">${contactBtns}</div>`:''}
     <div class="btns" style="margin-top:14px"><button type="button" class="btn sm" data-act="addVisit" data-id="${esc(p.id)}" id="btnAddVisit">${I('chip','sm')} Visit</button><button type="button" class="btn sm" data-act="addStay" data-id="${esc(p.id)}" id="btnAddStay">${I('bed','sm')} Stay</button><button type="button" class="btn sm ghost" data-act="contacted" data-id="${esc(p.id)}">${I('check','sm')} Contacted</button><button type="button" class="btn sm ghost" data-act="editPatron" data-id="${esc(p.id)}" id="btnEdit">${I('edit','sm')} Edit</button></div>
@@ -595,19 +587,16 @@ function vDetail(p){const st=stats(p),f=followState(p),t=today();
     <div class="fu-box ${f?f.cls:''}"><div><div class="tiny dim">NEXT FOLLOW-UP</div><div class="t">${f?`${fmtDW(p.followUp)} · <span class="due ${f.cls}">${f.label}</span>`:'Not scheduled'}</div>${p.followUpNote?`<div class="small muted">${esc(p.followUpNote)}</div>`:''}</div>
      <div class="btns"><button type="button" class="btn sm" data-act="contacted" data-id="${esc(p.id)}" id="btnContacted">${I('check','sm')} Mark contacted</button><button type="button" class="btn sm ghost" data-act="setFollow" data-id="${esc(p.id)}">${I('bell','sm')} ${f?'Change':'Schedule'}</button></div></div>
    </section>
-   <section class="card span2" id="totals"><h2 class="sec-t">${I('coin')} Gaming & comps</h2>
+   <section class="card span2" id="totals"><h2 class="sec-t">${I('coin')} ADT, comps & visits <span class="right tiny dim">HKD</span></h2>
     <div class="kv k4">
-     <div><div class="k">Rolling · 12m</div><div class="v" id="vRoll12">${money(st.roll12)}</div><div class="s">All-time <span id="vRollAll">${money(st.rollAll)}</span></div></div>
+     <div><div class="k">ADT</div><div class="v" id="vAdt">${adtStr(p,true)}</div><div class="s">avg daily theoretical</div></div>
      <div><div class="k">Comps · 12m</div><div class="v" id="vComp12">${money(st.comp12)}</div><div class="s">All-time <span id="vCompAll">${money(st.compAll)}</span></div></div>
-     <div><div class="k">Comp / rolling · 12m</div><div class="v" id="vRatio12">${pct(st.ratio12)}</div><div class="s">All-time <span id="vRatioAll">${pct(st.ratioAll)}</span></div></div>
-     <div><div class="k">Patron win/loss · 12m</div><div class="v ${wlc(st.wl12)}">${st.hasWl?(st.wl12>0?'+':'')+money(st.wl12):'—'}</div><div class="s">All-time ${st.hasWl?(st.wlAll>0?'+':'')+money(st.wlAll):'—'}</div></div>
+     <div><div class="k">Visits</div><div class="v" id="vVisits">${st.visits}</div><div class="s">${plural(st.stays,'stay')}</div></div>
+     <div><div class="k">Last seen</div><div class="v" id="vLast">${st.lastSeen?fmtD(st.lastSeen):'—'}</div><div class="s">${st.lastSeen?rel(st.lastSeen):'no visits yet'}</div></div>
     </div>
-    <div class="small dim" style="margin-top:10px">${plural(st.visits,'visit')} · ${plural(st.stays,'stay')} · last seen ${st.lastSeen?fmtD(st.lastSeen,true)+' ('+rel(st.lastSeen)+')':'—'}${dispCur()==='MOP'?' · HKD converted at '+rate():''}</div>
    </section>
-   <section class="card" id="prefs"><h2 class="sec-t">${I('star')} Preferences</h2>
-    ${prefRows.length?`<div class="prefs">${prefRows.map(x=>`<div><div class="k">${x[0]}</div><div class="v">${esc(x[1])}</div></div>`).join('')}</div>`:'<div class="empty-li">No preferences recorded.</div>'}
-   </section>
-   <section class="card" id="notes"><h2 class="sec-t">${I('note')} Notes</h2>${p.notes?`<div class="notes">${esc(p.notes)}</div>`:'<div class="empty-li">No notes.</div>'}</section>
+   ${prefRows.length?`<section class="card" id="prefs"><h2 class="sec-t">${I('star')} Preferences</h2><div class="prefs">${prefRows.map(x=>`<div><div class="k">${x[0]}</div><div class="v">${esc(x[1])}</div></div>`).join('')}</div></section>`:''}
+   ${p.notes?`<section class="card" id="notes"><h2 class="sec-t">${I('note')} Notes</h2><div class="notes">${esc(p.notes)}</div></section>`:''}
    <section class="card span2" id="timeline"><h2 class="sec-t">${I('clock')} Timeline <span class="cnt">${tlItems.length}</span></h2>
     ${tlItems.length?`<div class="tl">${tlItems.map(x=>tlItem(p,x)).join('')}</div>`:'<div class="empty-li">No visits, stays or contacts yet.</div>'}
    </section>
@@ -615,10 +604,10 @@ function vDetail(p){const st=stats(p),f=followState(p),t=today();
   <div class="btns" style="margin:18px 0;justify-content:center"><button type="button" class="btn ghost sm" data-act="deletePatron" data-id="${esc(p.id)}" style="color:var(--red)">${I('trash','sm')} Delete patron</button></div>`}
 function tlItem(p,x){const t=today(),o=x.o,ids=`data-id="${esc(p.id)}" data-sub="${esc(o.id)}"`;
   const ops=(k)=>`<div class="ops"><button type="button" class="btn xs ghost" data-act="edit${k}" ${ids}>${I('edit','sm')} Edit</button><button type="button" class="btn xs ghost" data-act="del${k}" ${ids} style="color:var(--red)">${I('trash','sm')}</button></div>`;
-  if(x.k==='visit'){const comps=o.comps.reduce((a,c)=>a+toMOP(c.value,c.cur),0);const R=o.rolling||0;
+  if(x.k==='visit'){const comps=o.comps.reduce((a,c)=>a+(+c.value||0),0);
     return `<div class="tli visit"><div class="dot">${I('chip')}</div><div class="h"><b>Visit</b><span class="d">${fmtDW(o.date)}${o.endDate&&o.endDate!==o.date?' – '+fmtD(o.endDate):''}</span></div>
-     <div class="money-line">${o.rolling!=null?`<span>Rolling <b>${moneyIn(o.rolling,o.cur)}</b></span>`:''}${o.winloss!=null?`<span>W/L <b style="color:${o.winloss<0?'var(--red)':'var(--green)'}">${o.winloss>0?'+':''}${moneyIn(o.winloss,o.cur)}</b></span>`:''}${o.comps.length?`<span>Comps <b>${money(comps)}</b>${R>0?` (${pct(comps/toMOP(R,o.cur))})`:''}</span>`:''}</div>
-     ${o.comps.length?`<div class="cchips">${o.comps.map(c=>`<span class="cchip">${esc(COMP_LABEL[c.type])} ${moneyIn(c.value,c.cur)}${c.note?' · '+esc(c.note):''}</span>`).join('')}</div>`:''}
+     ${o.comps.length?`<div class="money-line"><span>Comps <b>${money(comps,true)}</b></span></div>`:''}
+     ${o.comps.length?`<div class="cchips">${o.comps.map(c=>`<span class="cchip">${esc(COMP_LABEL[c.type])} ${money(c.value)}${c.note?' · '+esc(c.note):''}</span>`).join('')}</div>`:''}
      ${o.notes?`<div class="body">${esc(o.notes)}</div>`:''}${ops('Visit')}</div>`}
   if(x.k==='stay'){const n=diffDays(o.checkIn,o.checkOut);const status=inHouseStay(o,t)?(o.checkOut===t?'<span class="pill out">Checks out today</span>':'<span class="pill">In-house</span>'):o.checkIn>t?`<span class="pill up">Arrives ${rel(o.checkIn)}</span>`:'<span class="pill past">Past</span>';
     return `<div class="tli stay"><div class="dot">${I('bed')}</div><div class="h"><b>${esc(o.property)}</b>${status}</div><div class="d">${fmtDW(o.checkIn)} → ${fmtDW(o.checkOut)} · ${plural(n,'night')}</div>
@@ -636,11 +625,6 @@ function vSettings(){const m=S.meta,pin=m.pin,st=m.settings;
    ${pin?`<div class="set-row" style="margin-top:8px"><div><div class="t">Auto-lock</div><div class="tiny dim">after inactivity or when the app is in the background</div></div><select id="sAutoLock">${[[1,'1 min'],[2,'2 min'],[5,'5 min'],[15,'15 min'],[30,'30 min'],[0,'Never']].map(o=>`<option value="${o[0]}"${+st.autoLock===o[0]?' selected':''}>${o[1]}</option>`).join('')}</select></div>`:''}
    <div class="note-box">A 4–6 digit PIN is a <b>privacy screen</b>. With encryption on, data at rest is AES-GCM encrypted with a key derived from your PIN (PBKDF2-SHA256, ${PBKDF2_ITER.toLocaleString()} iterations). A short PIN can still be brute-forced by someone who copies the browser storage, so also keep your phone locked. <b>If you forget the PIN with encryption on, data cannot be recovered</b> — keep backups.</div>
   </section>
-  <section class="card" id="secCurrency"><h2 class="sec-t">${I('coin')} Currency</h2>
-   <div class="set-row"><div><div class="t">Show totals in</div><div class="tiny dim">per-visit amounts keep their own currency</div></div><select id="sDispCur">${CURS.map(c=>`<option${st.dispCur===c?' selected':''}>${c}</option>`).join('')}</select></div>
-   <div class="set-row"><div><div class="t">Default currency</div><div class="tiny dim">for new visits & comps</div></div><select id="sDefCur">${CURS.map(c=>`<option${st.defCur===c?' selected':''}>${c}</option>`).join('')}</select></div>
-   <div class="set-row"><div><div class="t">1 HKD = ? MOP</div><div class="tiny dim">used to combine HKD and MOP</div></div><input id="sRate" type="text" inputmode="decimal" value="${esc(st.hkdRate)}" style="max-width:110px"></div>
-  </section>
   <section class="card" id="secBackup"><h2 class="sec-t">${I('db')} Backup & export</h2>
    <div class="small muted" style="margin-bottom:10px">Last backup: ${m.lastBackup?fmtD(m.lastBackup,true)+' ('+rel(m.lastBackup)+')':'never'}. Files are saved unencrypted to your downloads — store them somewhere safe.</div>
    <div class="btns"><button type="button" class="btn sm" data-act="exportJson" id="btnExportJson">${I('down','sm')} Backup (JSON)</button><button type="button" class="btn sm ghost" data-act="import" id="btnImport">${I('up','sm')} Import JSON</button>
@@ -654,16 +638,20 @@ function vSettings(){const m=S.meta,pin=m.pin,st=m.settings;
 /* ============ Forms ============ */
 const optList=(arr,cur)=>arr.map(o=>{const [v,l]=Array.isArray(o)?o:[o,o];return `<option value="${esc(v)}"${v===cur?' selected':''}>${esc(l)}</option>`}).join('');
 const chipRow=(target,arr,mode)=>`<div class="chips">${arr.map(v=>`<button type="button" class="chip" data-act="chip" data-t="${target}" data-mode="${mode||'set'}" data-v="${esc(v)}">${esc(v)}</button>`).join('')}</div>`;
-function patronForm(p){const isNew=!p;p=p||normPatron({name:'x'});if(isNew)p.name='';const pr=p.prefs;const bd=bdayInfo(p)||{};
-  const days=Array.from({length:31},(_,i)=>i+1);
+function patronForm(p){const isNew=!p;p=p||normPatron({name:'x'});if(isNew)p.name='';const pr=p.prefs;
+  const bd=p.birthday||'',fullBd=/^(19|20)\d\d-/.test(bd)?bd:'',partialBd=bd&&!fullBd?bd:'';
+  const more=[p.cname,p.nickname,p.phones.length>1,p.whatsapp,p.wechat,p.email,p.tags.length,pr.room,pr.bed,pr.smoking,pr.games,pr.food,pr.other,p.notes,p.followUp].filter(Boolean).length;
   return `<form id="patronForm" novalidate autocomplete="off">
   <label>Name *<input name="name" type="text" value="${esc(p.name)}" autofocus required maxlength="160" placeholder="e.g. Chan Tai Man"></label>
+  <label>Date of birth<input name="dob" id="pDob" type="date" value="${esc(fullBd)}" min="1900-01-01" max="${today()}"></label>
+  ${partialBd?`<p class="hint" id="partialBd">Saved birthday: ${fmtD(partialBd)} (year unknown) — kept unless you enter a full date. <button type="button" class="linkbtn tiny" data-act="clearPartialBd">Remove</button><input type="hidden" name="keepBd" value="${esc(partialBd)}"></p>`:''}
+  <label>Phone number<input name="phone" id="pPhone" type="tel" value="${esc(p.phones[0]||'')}" maxlength="40" placeholder="+853 6xxx xxxx"></label>
+  <label>ADT <span class="dim">(average daily theoretical · HKD)</span><input name="adt" id="pAdt" type="text" inputmode="decimal" value="${p.adt==null?'':esc(p.adt)}" placeholder="e.g. 8000 or 8k"></label>
+  <details class="more" id="moreDetails"><summary>More details${more?`<span class="cnt">${more}</span>`:''} <span class="dim" style="font-weight:400">· optional</span></summary>
   <div class="row2"><label>Chinese name<input name="cname" type="text" value="${esc(p.cname)}" maxlength="80"></label><label>Nickname<input name="nickname" type="text" value="${esc(p.nickname)}" maxlength="80"></label></div>
-  <label>Tier / VIP level<input name="tier" type="text" value="${esc(p.tier)}" maxlength="40" list="tierList"></label><datalist id="tierList">${allTiers().map(t=>`<option value="${esc(t)}">`).join('')}</datalist>${chipRow('tier',TIERS)}
-  <label>Phone numbers <span class="dim">(one per line, with country code)</span><textarea name="phones" rows="2" style="min-height:60px" placeholder="+853 6xxx xxxx">${esc(p.phones.join('\n'))}</textarea></label>
-  <div class="row2"><label>WhatsApp number<input name="whatsapp" type="tel" value="${esc(p.whatsapp)}" placeholder="defaults to 1st phone"></label><label>WeChat ID<input name="wechat" type="text" value="${esc(p.wechat)}"></label></div>
+  <label>Other phone numbers <span class="dim">(one per line)</span><textarea name="phones2" rows="2" style="min-height:60px">${esc(p.phones.slice(1).join('\n'))}</textarea></label>
+  <div class="row2"><label>WhatsApp number<input name="whatsapp" type="tel" value="${esc(p.whatsapp)}" placeholder="defaults to phone"></label><label>WeChat ID<input name="wechat" type="text" value="${esc(p.wechat)}"></label></div>
   <label>Email<input name="email" type="email" value="${esc(p.email)}"></label>
-  <div class="row3"><label>Birthday month<select name="bm"><option value="">—</option>${MONL.map((m,i)=>`<option value="${i+1}"${bd.m===i+1?' selected':''}>${m}</option>`).join('')}</select></label><label>Day<select name="bdd"><option value="">—</option>${days.map(d=>`<option${bd.d===d?' selected':''}>${d}</option>`).join('')}</select></label><label>Year<input name="by" type="text" inputmode="numeric" maxlength="4" value="${bd.y?bd.y:''}" placeholder="opt."></label></div>
   <label>Tags <span class="dim">(comma separated)</span><input name="tags" type="text" value="${esc(p.tags.join(', '))}" placeholder="e.g. baccarat, referral, HK"></label>${allTags().length?chipRow('tags',allTags().slice(0,14),'add'):''}
   <fieldset class="fs"><legend>Preferences</legend>
    <label>Room type<input name="room" type="text" value="${esc(pr.room)}" list="roomList"></label><datalist id="roomList">${ROOMS.map(r=>`<option value="${esc(r)}">`).join('')}</datalist>
@@ -672,42 +660,42 @@ function patronForm(p){const isNew=!p;p=p||normPatron({name:'x'});if(isNew)p.nam
    <label>Food & drinks<textarea name="food" rows="2" style="min-height:60px">${esc(pr.food)}</textarea></label>
    <label>Other preferences<textarea name="other" rows="2" style="min-height:60px">${esc(pr.other)}</textarea></label>
   </fieldset>
-  <label>Notes<textarea name="notes" rows="4">${esc(p.notes)}</textarea></label>
+  <label>Notes<textarea name="notes" rows="3">${esc(p.notes)}</textarea></label>
   <div class="row2"><label>Next follow-up<input name="followUp" type="date" value="${esc(p.followUp)}"></label><label>Follow-up note<input name="followUpNote" type="text" value="${esc(p.followUpNote)}" maxlength="500"></label></div>
   ${chipRow('followUp',['+3 days','+1 week','+2 weeks','+1 month','Clear'],'date')}
+  </details>
   <div class="ferr"></div><div class="actions"><button type="button" class="btn ghost" data-act="closeModal">Cancel</button><button type="submit" class="btn" id="savePatron">Save</button></div></form>`}
-function readPatronForm(f,p){const g=n=>f.elements[n].value.trim();const name=g('name');if(!name)return 'Name is required.';
-  let birthday='';const bm=+g('bm'),bdd=+g('bdd'),by=g('by');
-  if(bm||bdd){if(!bm||!bdd)return 'Choose both birthday month and day (or neither).';if(by&&!/^(19|20)\d\d$/.test(by))return 'Birthday year should be 4 digits.';
-    const y=by?+by:2000;if(bdd>new Date(y,bm,0).getDate())return 'That birthday date does not exist.';birthday=`${by?by:'0000'}-${pad(bm)}-${pad(bdd)}`}
+function readPatronForm(f,p){const g=n=>f.elements[n]?f.elements[n].value.trim():'';const name=g('name');if(!name)return 'Name is required.';
+  let birthday='';const dob=g('dob');
+  if(dob){if(!isDate(dob)||!/^(19|20)\d\d-/.test(dob))return 'Date of birth is invalid.';if(dob>today())return 'Date of birth cannot be in the future.';birthday=dob}
+  else if(g('keepBd'))birthday=g('keepBd');
+  const adt=parseAmt(g('adt'));if(Number.isNaN(adt))return 'ADT is not a valid amount.';if(adt!=null&&adt<0)return 'ADT cannot be negative.';
   const email=g('email');if(email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return 'Email looks invalid.';
   const fu=g('followUp');if(fu&&!isDate(fu))return 'Follow-up date is invalid.';
-  Object.assign(p,{name,cname:g('cname'),nickname:g('nickname'),tier:g('tier'),phones:g('phones').split(/[\n;]+/).map(x=>x.trim()).filter(Boolean).slice(0,8),
-    whatsapp:g('whatsapp'),wechat:g('wechat'),email,birthday,tags:[...new Set(g('tags').split(',').map(x=>x.trim().replace(/^#/,'')).filter(Boolean))],
-    prefs:{room:g('room'),bed:g('bed'),smoking:g('smoking'),games:g('games'),food:g('food'),other:g('other')},notes:f.elements.notes.value.trim(),followUp:fu,followUpNote:g('followUpNote')});
+  const phones=[g('phone'),...g('phones2').split(/[\n;]+/)].map(x=>x.trim()).filter(Boolean).slice(0,8);
+  Object.assign(p,{name,cname:g('cname'),nickname:g('nickname'),phones,whatsapp:g('whatsapp'),wechat:g('wechat'),email,birthday,adt,
+    tags:[...new Set(g('tags').split(',').map(x=>x.trim().replace(/^#/,'')).filter(Boolean))],
+    prefs:{room:g('room'),bed:g('bed'),smoking:g('smoking'),games:g('games'),food:g('food'),other:g('other')},notes:g('notes'),followUp:fu,followUpNote:g('followUpNote')});
   return null}
 function openPatronForm(p){const isNew=!p;openModal(isNew?'New patron':'Edit patron',patronForm(p),{onSubmit:f=>{const target=isNew?normPatron({}):p;const err=readPatronForm(f,target);if(err)return err;
   touch(target);if(isNew){target.created=Date.now();S.data.patrons.push(target)}persist();toast(isNew?'Patron added':'Saved');if(isNew)location.hash='#/p/'+target.id;else render()}})}
 
-function compRow(c,defCur,defDate){c=c||{type:'room',value:'',cur:defCur,date:defDate,note:''};
-  return `<div class="comp-row"><select name="ctype" aria-label="Comp type">${optList(COMP_TYPES,c.type)}</select><input name="cval" type="text" inputmode="decimal" placeholder="Value" value="${c.value===''||c.value==null?'':esc(c.value)}" aria-label="Comp value"><select name="ccur" aria-label="Currency">${optList(CURS,c.cur)}</select><button type="button" class="rm" data-act="rmComp" aria-label="Remove comp">✕</button>
+function compRow(c,defDate){c=c||{type:'room',value:'',date:defDate,note:''};
+  return `<div class="comp-row"><select name="ctype" aria-label="Comp type">${optList(COMP_TYPES,c.type)}</select><input name="cval" type="text" inputmode="decimal" placeholder="HKD value" value="${c.value===''||c.value==null?'':esc(c.value)}" aria-label="Comp value (HKD)"><button type="button" class="rm" data-act="rmComp" aria-label="Remove comp">✕</button>
    <input class="cn2" name="cnote" type="text" placeholder="Note (e.g. 3n Nüwa suite)" value="${esc(c.note||'')}" aria-label="Comp note"><input class="cd" name="cdate" type="date" value="${esc(c.date||defDate)}" aria-label="Comp date"></div>`}
-function visitForm(v){const isNew=!v;const dc=S.meta.settings.defCur;v=v||{date:today(),endDate:'',rolling:null,winloss:null,cur:dc,notes:'',comps:[]};
+function visitForm(v){const isNew=!v;v=v||{date:today(),endDate:'',notes:'',comps:[]};
   return `<form id="visitForm" novalidate autocomplete="off">
   <div class="row2"><label>Date *<input name="date" type="date" value="${esc(v.date)}" required></label><label>End date <span class="dim">(multi-day trip)</span><input name="endDate" type="date" value="${esc(v.endDate)}"></label></div>
-  <div class="row3"><label>Rolling (turnover)<input name="rolling" id="vRolling" type="text" inputmode="decimal" placeholder="e.g. 2.5M" value="${v.rolling==null?'':esc(v.rolling)}" ${isNew?'autofocus':''}></label><label>Patron win/loss<input name="winloss" type="text" inputmode="decimal" placeholder="+win / −loss" value="${v.winloss==null?'':esc(v.winloss)}"></label><label>Currency<select name="cur">${optList(CURS,v.cur)}</select></label></div>
-  <p class="hint">Shorthand ok: 500k, 2.5m, 30萬. Win/loss is from the patron’s side: +80k = patron won, −80k = patron lost.</p>
-  <label>Notes<textarea name="notes" rows="3" placeholder="Tables played, who hosted, mood, requests…">${esc(v.notes)}</textarea></label>
+  <label>Notes<textarea name="notes" rows="3" ${isNew?'autofocus':''} placeholder="Tables played, who hosted, mood, requests…">${esc(v.notes)}</textarea></label>
   <div class="subhead"><span>${I('gift','sm')} Comps given</span><button type="button" class="btn xs ghost" data-act="addComp" id="addComp">+ Add comp</button></div>
-  <div id="comps">${v.comps.map(c=>compRow(c,dc,v.date)).join('')}</div>
+  <p class="hint" style="margin-top:0">Comp values in HKD. Shorthand ok: 1.5k, 2萬.</p><div id="comps">${v.comps.map(c=>compRow(c,v.date)).join('')}</div>
   <div class="ferr"></div><div class="actions"><button type="button" class="btn ghost" data-act="closeModal">Cancel</button><button type="submit" class="btn" id="saveVisit">Save visit</button></div></form>`}
 function readVisitForm(f,v){const g=n=>f.elements[n].value.trim();const date=g('date'),end=g('endDate');if(!isDate(date))return 'Please enter a valid date.';
   if(end&&(!isDate(end)||end<date))return 'End date must be on or after the start date.';
-  const rolling=parseAmt(g('rolling')),winloss=parseAmt(g('winloss'));if(Number.isNaN(rolling))return 'Rolling amount is not a number.';if(rolling!=null&&rolling<0)return 'Rolling cannot be negative.';if(Number.isNaN(winloss))return 'Win/loss is not a number.';
   const comps=[];for(const row of $$('.comp-row',f)){const val=parseAmt(row.querySelector('[name=cval]').value);const note=row.querySelector('[name=cnote]').value.trim();
     if(val==null&&!note)continue;if(Number.isNaN(val)||(val!=null&&val<0))return 'A comp value is not a valid amount.';const cd=row.querySelector('[name=cdate]').value;
-    comps.push(normComp({type:row.querySelector('[name=ctype]').value,value:val||0,cur:row.querySelector('[name=ccur]').value,date:isDate(cd)?cd:date,note}))}
-  Object.assign(v,{date,endDate:end&&end!==date?end:'',rolling,winloss,cur:curOf(g('cur')),notes:f.elements.notes.value.trim(),comps});return null}
+    comps.push(normComp({type:row.querySelector('[name=ctype]').value,value:val||0,date:isDate(cd)?cd:date,note}))}
+  Object.assign(v,{date,endDate:end&&end!==date?end:'',notes:f.elements.notes.value.trim(),comps});return null}
 function openVisitForm(p,v){const isNew=!v;openModal((isNew?'Log visit':'Edit visit')+' · '+p.name,visitForm(v),{onSubmit:f=>{const t=isNew?{id:uid()}:v;const e=readVisitForm(f,t);if(e)return e;
   if(isNew)p.visits.push(normVisit(t));touch(p);persist();toast(isNew?'Visit logged':'Visit saved');render()}})}
 function stayForm(s){const isNew=!s;s=s||{property:PROPERTIES[0],roomType:'',roomNo:'',checkIn:today(),checkOut:addDays(today(),2),comp:''};const known=PROPERTIES.includes(s.property);
@@ -751,51 +739,51 @@ function openQuickAdd(){if(!S.data.patrons.length){openPatronForm();return}
 function exampleData(){const t=today(),y=+t.slice(0,4),m=t.slice(5,7),dd=+t.slice(8,10);const D=n=>addDays(t,n);
   const bdDay=dd,bdDay2=dd>3?dd-2:Math.min(dd+3,28);
   const ex=(o)=>normPatron(Object.assign({example:true,tags:[]},o,{tags:['Example'].concat(o.tags||[]),notes:'FICTIONAL EXAMPLE PATRON — not a real person.\n'+(o.notes||'')}));
-  const c=(type,value,cur,date,note)=>({type,value,cur,date,note});
+  const c=(type,value,date,note)=>({type,value,date,note});
   return [
-   ex({name:'Chan Tai Man',cname:'陳大文',nickname:'Mr. Chan',tier:'Diamond',phones:['+853 0000 0001'],whatsapp:'+853 0000 0001',wechat:'example_chan',email:'chan@example.com',birthday:`1968-${m}-${pad(bdDay)}`,
-    tags:['Baccarat','HK'],prefs:{room:'Nüwa Sky Villa',bed:'King',smoking:'Non-smoking',food:'Cantonese; Hennessy XO; no shellfish',games:'Baccarat',other:'Prefers private salon, table 8. Wife: Mrs. Chan (jade collector).'},
+   ex({name:'Chan Tai Man',cname:'陳大文',nickname:'Mr. Chan',adt:12000,phones:['+853 0000 0001'],whatsapp:'+853 0000 0001',wechat:'example_chan',email:'chan@example.com',birthday:`1968-${m}-${pad(bdDay)}`,
+    tags:['Baccarat','HK'],prefs:{room:'Nüwa Suite',bed:'King',smoking:'Non-smoking',food:'Cantonese; no shellfish',games:'Baccarat',other:'Likes the same mass-floor table by the window.'},
     notes:'Arrives by ferry from HK Friday evenings. Likes a birthday cake from Jade Dragon.',followUp:t,followUpNote:'Confirm birthday dinner at Jade Dragon',
-    visits:[{date:D(-1),endDate:D(2),rolling:12500000,winloss:-380000,cur:'HKD',notes:'Private salon. Very happy with villa.',comps:[c('room',48000,'MOP',D(-1),'3n Nüwa Sky Villa'),c('fnb',12800,'MOP',D(-1),'Jade Dragon dinner for 6'),c('limo',3200,'HKD',D(-1),'Ferry pickup')]},
-     {date:D(-35),rolling:8600000,winloss:220000,cur:'HKD',notes:'Short trip.',comps:[c('room',16000,'MOP',D(-35),'1n suite'),c('spa',4200,'MOP',D(-35),'Spa for Mrs. Chan')]},
-     {date:D(-120),rolling:21000000,winloss:-1250000,cur:'HKD',comps:[c('room',52000,'MOP',D(-120),'4n villa'),c('flight',18500,'HKD',D(-120),'Business class from Taipei')]}],
-    stays:[{property:'Nüwa',roomType:'Sky Villa',roomNo:'3801',checkIn:D(-1),checkOut:D(2),comp:'Fully comped, late checkout'},{property:'Nüwa',roomType:'Suite',roomNo:'3512',checkIn:D(-35),checkOut:D(-34),comp:'Comped'}],
-    contacts:[{date:D(-5),channel:'WhatsApp',note:'Confirmed arrival and villa.'}]}),
-   ex({name:'Wong Siu Ming',cname:'黃小明',tier:'Platinum',phones:['+852 0000 0002'],wechat:'example_wong',birthday:`0000-${m}-${pad(bdDay2)}`,tags:['Referral'],
-    prefs:{room:'Morpheus Suite',bed:'King',smoking:'Smoking',food:'Japanese, single malt',games:'Baccarat, Sic Bo'},followUp:D(-3),followUpNote:'Send Morpheus suite confirmation',
-    visits:[{date:D(-20),rolling:3400000,winloss:-150000,cur:'MOP',comps:[c('room',9800,'MOP',D(-20),'2n Morpheus'),c('fnb',3600,'MOP',D(-20),'Yi dinner')]}],
-    stays:[{property:'Morpheus',roomType:'Suite',checkIn:D(2),checkOut:D(5),comp:'Room comp approved'},{property:'Morpheus',roomType:'Deluxe King',checkIn:D(-20),checkOut:D(-18)}]}),
-   ex({name:'Lee Siu Mui',cname:'李小梅',nickname:'May',tier:'Gold',phones:['+86 000 0000 0003'],wechat:'example_may',tags:['Mainland','Slots'],prefs:{room:'Deluxe Twin',bed:'Twin',smoking:'Non-smoking',food:'Vegetarian',games:'Slots, Roulette'},
-    followUp:D(4),followUpNote:'Ask about Golden Week plans',visits:[{date:D(-50),rolling:680000,winloss:45000,cur:'MOP',comps:[c('fnb',1800,'MOP',D(-50),'Buffet x2')]}],
+    visits:[{date:D(-1),endDate:D(2),notes:'Mass floor, very happy with suite.',comps:[c('room',6600,D(-1),'3n Nüwa suite'),c('fnb',2400,D(-1),'Jade Dragon dinner for 2'),c('limo',800,D(-1),'Ferry pickup')]},
+     {date:D(-35),notes:'Short trip.',comps:[c('room',2200,D(-35),'1n deluxe'),c('spa',1200,D(-35),'Spa for Mrs. Chan')]},
+     {date:D(-120),comps:[c('room',4400,D(-120),'2n suite'),c('ferry',600,D(-120),'Ferry tickets')]}],
+    stays:[{property:'Nüwa',roomType:'Suite',roomNo:'3801',checkIn:D(-1),checkOut:D(2),comp:'Comped, late checkout'},{property:'Nüwa',roomType:'Deluxe King',roomNo:'3512',checkIn:D(-35),checkOut:D(-34),comp:'Comped'}],
+    contacts:[{date:D(-5),channel:'WhatsApp',note:'Confirmed arrival and suite.'}]}),
+   ex({name:'Wong Siu Ming',cname:'黃小明',adt:6500,phones:['+852 0000 0002'],wechat:'example_wong',birthday:`1979-${m}-${pad(bdDay2)}`,tags:['Referral'],
+    prefs:{room:'Morpheus Deluxe',bed:'King',smoking:'Smoking',food:'Japanese, single malt',games:'Baccarat, Sic Bo'},followUp:D(-3),followUpNote:'Send Morpheus room confirmation',
+    visits:[{date:D(-20),comps:[c('room',3800,D(-20),'2n Morpheus'),c('fnb',900,D(-20),'Noodle bar')]}],
+    stays:[{property:'Morpheus',roomType:'Deluxe King',checkIn:D(2),checkOut:D(5),comp:'Room comp approved'},{property:'Morpheus',roomType:'Deluxe King',checkIn:D(-20),checkOut:D(-18)}]}),
+   ex({name:'Lee Siu Mui',cname:'李小梅',nickname:'May',adt:1800,phones:['+86 000 0000 0003'],wechat:'example_may',birthday:'1990-03-08',tags:['Mainland','Slots'],prefs:{room:'Deluxe Twin',bed:'Twin',smoking:'Non-smoking',food:'Vegetarian',games:'Slots, Roulette'},
+    followUp:D(4),followUpNote:'Ask about Golden Week plans',visits:[{date:D(-50),comps:[c('fnb',600,D(-50),'Buffet x2')]}],
     stays:[{property:'The Countdown',roomType:'Deluxe Twin',checkIn:D(5),checkOut:D(7)}]}),
-   ex({name:'Tanaka Hiroshi',nickname:'Tanaka-san',tier:'VIP',phones:['+81 00 0000 0004'],email:'tanaka@example.com',tags:['Japan','Blackjack'],prefs:{room:'Grand Hyatt Grand Suite',bed:'King',smoking:'Non-smoking',food:'Sushi, sake',games:'Blackjack'},
-    followUp:D(-10),followUpNote:'Win-back offer: 2n comp',visits:[{date:D(-75),rolling:5200000,winloss:-610000,cur:'HKD',comps:[c('room',11000,'MOP',D(-75),'2n GH suite'),c('flight',9000,'HKD',D(-75),'Flight credit')]},{date:D(-160),rolling:4100000,cur:'HKD'}],
-    stays:[{property:'Grand Hyatt Macau',roomType:'Grand Suite',checkIn:D(-75),checkOut:D(-73)}]}),
-   ex({name:'Ho Ka Wai',cname:'何家偉',tier:'Premium Mass',phones:['+853 0000 0005'],birthday:`1985-${m}-${pad(Math.max(1,Math.min(28,dd+6)))}`,tags:['Local'],prefs:{room:'Deluxe King',smoking:'Non-smoking',games:'Baccarat'},
-    visits:[{date:D(-2),rolling:420000,winloss:-30000,cur:'MOP',comps:[c('fnb',900,'MOP',D(-2),'Noodle bar')]},{date:D(-9),rolling:260000,cur:'MOP'}],
+   ex({name:'Tanaka Hiroshi',nickname:'Tanaka-san',adt:4200,phones:['+81 00 0000 0004'],email:'tanaka@example.com',birthday:'1975-11-21',tags:['Japan','Blackjack'],prefs:{room:'Grand Hyatt Deluxe',bed:'King',smoking:'Non-smoking',food:'Sushi, sake',games:'Blackjack'},
+    followUp:D(-10),followUpNote:'Win-back offer: 2n room',visits:[{date:D(-75),comps:[c('room',3000,D(-75),'2n GH deluxe'),c('fnb',800,D(-75),'Dinner credit')]},{date:D(-160)}],
+    stays:[{property:'Grand Hyatt Macau',roomType:'Deluxe King',checkIn:D(-75),checkOut:D(-73)}]}),
+   ex({name:'Ho Ka Wai',cname:'何家偉',adt:2500,phones:['+853 0000 0005'],birthday:`1985-${m}-${pad(Math.max(1,Math.min(28,dd+6)))}`,tags:['Local'],prefs:{room:'Deluxe King',smoking:'Non-smoking',games:'Baccarat'},
+    visits:[{date:D(-2),comps:[c('fnb',400,D(-2),'Noodle bar')]},{date:D(-9)}],
     stays:[{property:'Grand Hyatt Macau',roomType:'Deluxe King',roomNo:'1206',checkIn:D(-2),checkOut:t,comp:'Staycation rate'}]}),
-   ex({name:'Maria Santos',tier:'VIP',phones:['+63 000 000 0006'],email:'maria@example.com',tags:['Philippines'],prefs:{room:'Suite',bed:'King',food:'Portuguese; Vinho Verde',games:'Roulette, Poker'},
-    visits:[{date:D(-130),rolling:2300000,winloss:120000,cur:'HKD',comps:[c('room',8400,'MOP',D(-130),'2n Countdown suite'),c('spa',2600,'MOP',D(-130))]}],stays:[{property:'The Countdown',roomType:'Suite',checkIn:D(-130),checkOut:D(-128)}]}),
-   ex({name:'Zhang Wei',cname:'張偉',tier:'Platinum',phones:['+86 000 0000 0007'],wechat:'example_zhang',tags:['Mainland','Baccarat'],prefs:{room:'Nüwa Suite',bed:'King',smoking:'Smoking',food:'Sichuan; Moutai',games:'Baccarat'},followUp:D(6),followUpNote:'Invite to year-end party',
-    visits:[{date:D(-12),endDate:D(-10),rolling:9800000,winloss:-420000,cur:'MOP',comps:[c('room',24000,'MOP',D(-12),'2n Nüwa suite'),c('fnb',8800,'MOP',D(-11)),c('gift',5000,'MOP',D(-10),'Mooncake set')]},{date:D(-70),rolling:6100000,cur:'MOP'}],
-    stays:[{property:'Nüwa',roomType:'Suite',roomNo:'2802',checkIn:D(-12),checkOut:D(-10),comp:'Comped'}],contacts:[{date:D(-8),channel:'WeChat',note:'Thanked for visit.'}]})
+   ex({name:'Maria Santos',adt:3000,phones:['+63 000 000 0006'],email:'maria@example.com',birthday:'1982-07-02',tags:['Philippines'],prefs:{room:'Deluxe',bed:'King',food:'Portuguese; Vinho Verde',games:'Roulette, Poker'},
+    visits:[{date:D(-130),comps:[c('room',2600,D(-130),'2n Countdown deluxe'),c('spa',900,D(-130))]}],stays:[{property:'The Countdown',roomType:'Deluxe King',checkIn:D(-130),checkOut:D(-128)}]}),
+   ex({name:'Zhang Wei',cname:'張偉',adt:9000,phones:['+86 000 0000 0007'],wechat:'example_zhang',birthday:'1972-01-15',tags:['Mainland','Baccarat'],prefs:{room:'Nüwa Deluxe',bed:'King',smoking:'Smoking',food:'Sichuan',games:'Baccarat'},followUp:D(6),followUpNote:'Invite to year-end party',
+    visits:[{date:D(-12),endDate:D(-10),comps:[c('room',4400,D(-12),'2n Nüwa deluxe'),c('fnb',1600,D(-11)),c('gift',800,D(-10),'Mooncake set')]},{date:D(-70)}],
+    stays:[{property:'Nüwa',roomType:'Deluxe King',roomNo:'2802',checkIn:D(-12),checkOut:D(-10),comp:'Comped'}],contacts:[{date:D(-8),channel:'WeChat',note:'Thanked for visit.'}]})
   ]}
 
 /* ============ Import / export ============ */
 function download(name,text,type){const blob=new Blob([text],{type});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000)}
-function exportJson(){const out={app:'patron-book',version:1,exportedAt:new Date().toISOString(),settings:{hkdRate:rate()},patrons:S.data.patrons};
+function exportJson(){const out={app:'patron-book',version:2,exportedAt:new Date().toISOString(),currency:'HKD',patrons:S.data.patrons};
   download(`patron-book-backup-${today()}.json`,JSON.stringify(out,null,1),'application/json');S.meta.lastBackup=today();saveMeta();toast('Backup downloaded — keep it private');render()}
 const csvCell=v=>{if(v==null)return '';if(typeof v==='number')return isFinite(v)?String(Math.round(v*100)/100):'';let s=String(v);if(/^[=+\-@\t\r]/.test(s))s="'"+s;return /[",\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s};
 const toCsv=rows=>'\ufeff'+rows.map(r=>r.map(csvCell).join(',')).join('\r\n');
-function exportCsv(){const h=['ID','Name','Chinese name','Nickname','Tier','Tags','Phones','WhatsApp','WeChat','Email','Birthday','Room pref','Bed','Smoking','Food & drinks','Games','Other prefs','Notes','Next follow-up','Follow-up note','Last seen','Visits','Stays','Contacts','Rolling 12m (MOP)','Rolling all-time (MOP)','Comps 12m (MOP)','Comps all-time (MOP)','Comp/rolling 12m %','Comp/rolling all-time %','Win/loss 12m (MOP)','Win/loss all-time (MOP)','Example'];
-  const rows=[h,...S.data.patrons.map(p=>{const s=stats(p),r=p.prefs;const pc=x=>x==null?'':Math.round(x*10000)/100;
-    return [p.id,p.name,p.cname,p.nickname,p.tier,p.tags.join('; '),p.phones.join('; '),p.whatsapp,p.wechat,p.email,p.birthday.replace(/^0000/,'----'),r.room,r.bed,r.smoking,r.food,r.games,r.other,p.notes,p.followUp,p.followUpNote,s.lastSeen,s.visits,s.stays,p.contacts.length,s.roll12,s.rollAll,s.comp12,s.compAll,pc(s.ratio12),pc(s.ratioAll),s.wl12,s.wlAll,p.example?'yes':'']})];
+function exportCsv(){const h=['ID','Name','Date of birth','Phone','Other phones','ADT (HKD)','Chinese name','Nickname','Tags','WhatsApp','WeChat','Email','Room pref','Bed','Smoking','Food & drinks','Games','Other prefs','Notes','Next follow-up','Follow-up note','Last seen','Visits','Stays','Contacts','Comps 12m (HKD)','Comps all-time (HKD)','Example'];
+  const rows=[h,...S.data.patrons.map(p=>{const s=stats(p),r=p.prefs;
+    return [p.id,p.name,p.birthday.replace(/^0000/,'----'),p.phones[0]||'',p.phones.slice(1).join('; '),p.adt,p.cname,p.nickname,p.tags.join('; '),p.whatsapp,p.wechat,p.email,r.room,r.bed,r.smoking,r.food,r.games,r.other,p.notes,p.followUp,p.followUpNote,s.lastSeen,s.visits,s.stays,p.contacts.length,s.comp12,s.compAll,p.example?'yes':'']})];
   download(`patron-book-patrons-${today()}.csv`,toCsv(rows),'text/csv;charset=utf-8');toast('Patrons CSV downloaded')}
-function exportActCsv(){const rows=[['Patron ID','Patron','Type','Date','End date','Property','Room','Rolling','Win/loss','Currency','Rolling (MOP)','Comp type','Comp value','Comp currency','Comp (MOP)','Channel','Notes']];
-  for(const p of S.data.patrons){for(const v of p.visits){rows.push([p.id,p.name,'visit',v.date,v.endDate,'','',v.rolling,v.winloss,v.cur,toMOP(v.rolling,v.cur),'','','','','',v.notes]);
-      for(const c of v.comps)rows.push([p.id,p.name,'comp',c.date||v.date,'','','','','','','',COMP_LABEL[c.type],c.value,c.cur,toMOP(c.value,c.cur),'',c.note])}
-    for(const s of p.stays)rows.push([p.id,p.name,'stay',s.checkIn,s.checkOut,s.property,[s.roomType,s.roomNo].filter(Boolean).join(' #'),'','','','','','','','','',s.comp]);
-    for(const c of p.contacts)rows.push([p.id,p.name,'contact',c.date,'','','','','','','','','','','',c.channel,c.note])}
+function exportActCsv(){const rows=[['Patron ID','Patron','Type','Date','End date','Property','Room','Comp type','Comp value (HKD)','Channel','Notes']];
+  for(const p of S.data.patrons){for(const v of p.visits){rows.push([p.id,p.name,'visit',v.date,v.endDate,'','','','','',v.notes]);
+      for(const c of v.comps)rows.push([p.id,p.name,'comp',c.date||v.date,'','','',COMP_LABEL[c.type],c.value,'',c.note])}
+    for(const s of p.stays)rows.push([p.id,p.name,'stay',s.checkIn,s.checkOut,s.property,[s.roomType,s.roomNo].filter(Boolean).join(' #'),'','','',s.comp]);
+    for(const c of p.contacts)rows.push([p.id,p.name,'contact',c.date,'','','','','',c.channel,c.note])}
   rows.splice(1,rows.length,...rows.slice(1).sort((a,b)=>b[3].localeCompare(a[3])));
   download(`patron-book-activity-${today()}.csv`,toCsv(rows),'text/csv;charset=utf-8');toast('Activity CSV downloaded')}
 async function importFile(file){if(!file)return;if(file.size>25e6){toast('File too large',true);return}
@@ -865,7 +853,9 @@ function render(){if(!S.unlocked||!S.data)return;memo.clear();const r=route();le
   $$('#tabs [data-nav]').forEach(a=>a.classList.toggle('on',a.dataset.nav===(r.v==='detail'?'patrons':r.v)));
   $('#exBanner').classList.toggle('hide',!S.data.patrons.some(p=>p.example));$('#lockBtn').classList.toggle('hide',!S.meta.pin);
   document.documentElement.style.setProperty('--hh',$('header.top').offsetHeight+'px')}
-function startApp(){S.unlocked=true;S.lastActivity=Date.now();$('#lock').classList.add('hide');$('#app').classList.remove('hide');render()}
+function startApp(){S.unlocked=true;S.lastActivity=Date.now();$('#lock').classList.add('hide');$('#app').classList.remove('hide');
+  if(S.migrate&&S.data){S.migrate=false;persist()}/* one-time rewrite of pre-v2 data in the new format (legacy fields kept under .legacy) */
+  render()}
 window.addEventListener('hashchange',()=>{closeAllModals();render();window.scrollTo(0,0)});
 window.addEventListener('resize',()=>{const h=$('header.top');if(h)document.documentElement.style.setProperty('--hh',h.offsetHeight+'px')});
 
@@ -889,15 +879,15 @@ const ACT={
  contacted:el=>openContacted(pById(el)),setFollow:el=>openSetFollow(pById(el)),
  deletePatron:async el=>{const p=pById(el);if(!p)return;if(!await confirmDlg(`Delete <b>${esc(p.name)}</b> and all ${p.visits.length} visits, ${p.stays.length} stays? This cannot be undone.`,{ok:'Delete patron'}))return;
    S.data.patrons=S.data.patrons.filter(x=>x!==p);persist();toast('Patron deleted');location.hash='#/patrons'},
- addComp:el=>{const f=el.closest('form');$('#comps',f).insertAdjacentHTML('beforeend',compRow(null,S.meta.settings.defCur,f.elements.date.value||today()));const rows=$$('.comp-row',f);rows[rows.length-1].querySelector('[name=cval]').focus()},
+ addComp:el=>{const f=el.closest('form');$('#comps',f).insertAdjacentHTML('beforeend',compRow(null,f.elements.date.value||today()));const rows=$$('.comp-row',f);rows[rows.length-1].querySelector('[name=cval]').focus()},
  rmComp:el=>el.closest('.comp-row').remove(),
  nights:el=>{const f=el.closest('form');const ci=f.elements.checkIn.value;if(isDate(ci))f.elements.checkOut.value=addDays(ci,+el.dataset.n)},
  chip:el=>{const f=el.closest('form');const inp=f.elements[el.dataset.t];const v=el.dataset.v;
    if(el.dataset.mode==='date'){const map={'+3 days':()=>addDays(today(),3),'+1 week':()=>addDays(today(),7),'+2 weeks':()=>addDays(today(),14),'+1 month':()=>addMonths(today(),1),'Clear':()=>''};inp.value=map[v]();}
    else if(el.dataset.mode==='add'){const parts=inp.value.split(',').map(x=>x.trim()).filter(Boolean);if(!parts.some(x=>x.toLowerCase()===v.toLowerCase()))parts.push(v);inp.value=parts.join(', ')}
    else inp.value=v},
- topPeriod:el=>{S.topPeriod=el.dataset.v;render()},
- clearFilters:()=>{S.list={q:'',tier:'',tag:'',sort:S.list.sort,minRoll:''};render()},
+ clearPartialBd:el=>{const w=el.closest('#partialBd');if(w)w.remove()},
+ clearFilters:()=>{S.list={q:'',tag:'',sort:S.list.sort};render()},
  copy:async el=>{const v=el.dataset.v;try{await navigator.clipboard.writeText(v);toast('WeChat ID copied')}catch(e){const ta=document.createElement('textarea');ta.value=v;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast('WeChat ID copied')}catch(_){toast(v)}ta.remove()}},
  loadExample:async()=>{if(S.data.patrons.some(p=>p.example)&&!await confirmDlg('Reload example patrons? Existing examples will be replaced; your real patrons are untouched.',{ok:'Reload',danger:false}))return;
    S.data.patrons=S.data.patrons.filter(p=>!p.example).concat(exampleData());persist();toast('Example data loaded');location.hash='#/';render()},
@@ -922,11 +912,8 @@ $('#lockForm').addEventListener('submit',e=>{e.preventDefault();tryUnlock()});
 $('#pinInput').addEventListener('input',e=>{e.target.value=e.target.value.replace(/\D/g,'').slice(0,6)});
 document.addEventListener('input',e=>{const id=e.target.id;if(id==='q'){S.list.q=e.target.value;renderList()}});
 document.addEventListener('change',e=>{const id=e.target.id,v=e.target.value;const L=S.list;
-  if(id==='fTier'){L.tier=v;renderList()}else if(id==='fTag'){L.tag=v;renderList()}else if(id==='fRoll'){L.minRoll=v;renderList()}else if(id==='fSort'){L.sort=v;renderList()}
-  else if(id==='sDispCur'){S.meta.settings.dispCur=v;saveMeta();toast('Totals shown in '+v)}
-  else if(id==='sDefCur'){S.meta.settings.defCur=v;saveMeta()}
+  if(id==='fTag'){L.tag=v;renderList()}else if(id==='fSort'){L.sort=v;renderList()}
   else if(id==='sAutoLock'){S.meta.settings.autoLock=+v;saveMeta()}
-  else if(id==='sRate'){const r=parseFloat(v);if(r>0.5&&r<2){S.meta.settings.hkdRate=r;saveMeta();toast('Rate saved')}else{toast('Enter a rate like 1.03',true);e.target.value=S.meta.settings.hkdRate}}
   else if(id==='importFile'){const fl=e.target.files[0];e.target.value='';importFile(fl)}});
 ['pointerdown','touchstart','scroll'].forEach(ev=>window.addEventListener(ev,()=>{S.lastActivity=Date.now()},{passive:true}));
 const autoLockMs=()=>(+S.meta.settings.autoLock||0)*60e3;
