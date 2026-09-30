@@ -244,6 +244,8 @@ details.more>summary::-webkit-details-marker{display:none}
 details.more>summary::before{content:'▸ '}details.more[open]>summary::before{content:'▾ '}
 details.more[open]{padding-bottom:4px}
 details.more .cnt{font-size:11px;font-weight:600;background:rgba(216,180,106,.15);border-radius:999px;padding:1px 7px;margin-left:4px}
+.cod{font-size:11.5px;font-weight:600;letter-spacing:.04em;color:var(--gold2);border:1px dashed var(--goldd);border-radius:6px;padding:0 6px;font-variant-numeric:tabular-nums}
+.warn{color:#f0c36a}
 @media (prefers-reduced-motion:reduce){*{animation:none!important}}
 </style>
 </head>
@@ -446,7 +448,7 @@ function normPatron(p){p=p&&typeof p==='object'?p:{};const pr=p.prefs||{};
   const phones=(Array.isArray(p.phones)?p.phones:(p.phone?[p.phone]:[])).map(x=>str(x,40).trim()).filter(Boolean).slice(0,8);
   const tags=[...new Set((Array.isArray(p.tags)?p.tags:String(p.tags||'').split(',')).map(t=>str(t,40).trim()).filter(Boolean))].slice(0,30);
   let bd=str(p.birthday,10);if(!/^(\d{4})-\d{2}-\d{2}$/.test(bd)||!isDate(bd))bd='';
-  return {id:str(p.id,40)||uid(),name:str(p.name,160).trim()||'(Unnamed)',cname:str(p.cname,80).trim(),nickname:str(p.nickname,80).trim(),phones,
+  return {id:str(p.id,40)||uid(),name:str(p.name,160).trim()||'(Unnamed)',codNo:str(p.codNo,40).trim(),cname:str(p.cname,80).trim(),nickname:str(p.nickname,80).trim(),phones,
     whatsapp:str(p.whatsapp,40).trim(),wechat:str(p.wechat,80).trim(),email:str(p.email,160).trim(),birthday:bd,adt:(()=>{const n=numOrNull(p.adt);return n!=null&&n>=0?n:null})(),legacy:legacyOf(p,['tier']),
     prefs:{room:str(pr.room,200),bed:str(pr.bed,60),smoking:str(pr.smoking,40),food:str(pr.food,1000),games:str(pr.games,300),other:str(pr.other,2000)},
     notes:str(p.notes,20000),tags,followUp:dateOf(p.followUp),followUpNote:str(p.followUpNote,500),example:!!p.example,
@@ -466,6 +468,9 @@ const inHouseStay=(s,t)=>s.checkIn<=t&&s.checkOut>=t;
 function followState(p){if(!p.followUp)return null;const d=diffDays(today(),p.followUp);return {d,cls:d<0?'over':d===0?'today':'soon',label:d<0?`Overdue ${-d}d`:d===0?'Due today':d===1?'Tomorrow':`In ${d}d`}}
 function bdayInfo(p){if(!p.birthday)return null;const [y,m,d]=p.birthday.split('-').map(Number);return {y,m,d}}
 function ageOf(p){const b=bdayInfo(p);if(!b||!b.y)return null;const t=today(),[ty,tm,td]=t.split('-').map(Number);return ty-b.y-((tm<b.m||(tm===b.m&&td<b.d))?1:0)}
+const normCod=v=>String(v||'').replace(/[^a-z0-9]/gi,'').toLowerCase();
+function dupCod(cod,selfId){const k=normCod(cod);if(!k||!S.data)return null;return S.data.patrons.find(o=>o.id!==selfId&&normCod(o.codNo)===k)||null}
+const codTag=p=>p.codNo?`<span class="cod">No. ${esc(p.codNo)}</span>`:'';
 const adtStr=(p,full)=>p.adt!=null?money(p.adt,full):'—';
 function initials(p){if(p.cname)return esc([...p.cname][0]);const w=p.name.replace(/[^\p{L}\s]/gu,'').trim().split(/\s+/);return esc(((w[0]||'?')[0]+(w.length>1?w[w.length-1][0]:'')).toUpperCase())}
 
@@ -476,7 +481,7 @@ function waNumber(p){const n=(p.whatsapp||p.phones[0]||'').replace(/[^\d]/g,'');
 function telHref(n){const c=n.replace(/[^\d+]/g,'');return c?'tel:'+c:''}
 /* ============ Views ============ */
 function pRow(p,right='',sub=''){const st=stats(p);
-  return `<div class="prow" role="link" tabindex="0" data-act="open" data-id="${esc(p.id)}"><div class="av">${initials(p)}</div><div class="pm"><div class="pn">${esc(p.name)}${p.cname?`<span class="cn">${esc(p.cname)}</span>`:''}${exBadge(p)}</div><div class="ps">${sub}</div></div>${right?`<div class="pr">${right}</div>`:''}</div>`}
+  return `<div class="prow" role="link" tabindex="0" data-act="open" data-id="${esc(p.id)}"><div class="av">${initials(p)}</div><div class="pm"><div class="pn">${esc(p.name)}${p.cname?`<span class="cn">${esc(p.cname)}</span>`:''}${exBadge(p)}</div><div class="ps">${codTag(p)}${sub}</div></div>${right?`<div class="pr">${right}</div>`:''}</div>`}
 function emptyState(){return `<div class="card empty" id="emptyState"><div class="crest">◆</div><h2>Welcome to your Patron Book</h2>
  <p class="muted">A private, on-device book of your patrons, their visits, stays, comps and follow-ups. Nothing leaves this phone — no internet, no cloud.</p>
  <div class="btns"><button type="button" class="btn" data-act="newPatron">${I('plus')} Add first patron</button><button type="button" class="btn ghost" data-act="loadExample" id="loadExample">Load example data</button><button type="button" class="btn ghost" data-act="import">${I('up','sm')} Import backup</button></div></div>`}
@@ -542,13 +547,13 @@ function vPatrons(){if(!S.data.patrons.length)return emptyState();const L=S.list
     <select id="fTag" aria-label="Tag">${opt('','All tags',L.tag)}${allTags().map(t=>opt(t,'#'+t,L.tag)).join('')}</select>
     <select id="fSort" aria-label="Sort">${[['recent','Sort: Last visit'],['name','Sort: Name A–Z'],['follow','Sort: Follow-up soonest'],['adt','Sort: ADT (highest)']].map(o=>opt(o[0],o[1],L.sort)).join('')}</select>
    </div></div><div class="count" id="plCount"></div><div class="card" style="padding:4px 10px"><div id="plist"></div></div>`}
-function searchText(p){return [p.name,p.cname,p.nickname,p.email,p.wechat,p.whatsapp,...p.phones,...p.tags,p.notes,p.followUpNote,p.prefs.room,p.prefs.bed,p.prefs.smoking,p.prefs.food,p.prefs.games,p.prefs.other,
+function searchText(p){return [p.name,p.codNo,p.cname,p.nickname,p.email,p.wechat,p.whatsapp,...p.phones,...p.tags,p.notes,p.followUpNote,p.prefs.room,p.prefs.bed,p.prefs.smoking,p.prefs.food,p.prefs.games,p.prefs.other,
   ...p.visits.map(v=>v.notes+' '+v.comps.map(c=>c.note).join(' ')),...p.stays.map(s=>s.property+' '+s.roomNo+' '+s.roomType+' '+s.comp),...p.contacts.map(c=>c.note)].join('\n').toLowerCase()}
 function filteredPatrons(){const L=S.list,q=L.q.trim().toLowerCase(),qd=q.replace(/[^\d]/g,'');const t=today();
   const terms=q.split(/\s+/).filter(Boolean);
   let arr=S.data.patrons.filter(p=>{if(L.tag&&!p.tags.includes(L.tag))return false;
     if(terms.length){const txt=searchText(p);const ok=terms.every(w=>txt.includes(w.replace(/^#/,'')));
-      if(!ok){if(qd.length>=3&&p.phones.concat(p.whatsapp).some(n=>n.replace(/[^\d]/g,'').includes(qd)))return true;return false}}
+      if(!ok){const qc=normCod(q);if(qc.length>=2&&normCod(p.codNo).includes(qc))return true;if(qd.length>=3&&p.phones.concat(p.whatsapp).some(n=>n.replace(/[^\d]/g,'').includes(qd)))return true;return false}}
     return true});
   const sorters={name:(a,b)=>a.name.localeCompare(b.name),
     recent:(a,b)=>(stats(b).lastSeen||'').localeCompare(stats(a).lastSeen||'')||a.name.localeCompare(b.name),
@@ -578,7 +583,7 @@ function vDetail(p){const st=stats(p),f=followState(p),t=today();
   <div class="grid two">
    <section class="card hl span2" id="detailHead">
     <div class="dh"><div class="av big">${initials(p)}</div><div style="min-width:0"><h1 id="dName">${esc(p.name)}${p.cname?` <span class="cn">${esc(p.cname)}</span>`:''}${exBadge(p)}</h1>
-     <div class="ps" style="margin-top:4px">${p.adt!=null?`<span class="tier" id="dAdt">ADT ${money(p.adt,true)}</span>`:''}${p.nickname?`<span>“${esc(p.nickname)}”</span>`:''}${bd?`<span class="dim" id="dDob">${I('cake','sm')} ${bd.d} ${MON[bd.m-1]}${bd.y?' '+bd.y+' · age '+ageOf(p):''}</span>`:''}${p.stays.some(s=>inHouseStay(s,t))?'<span class="pill">In-house</span>':''}</div>
+     <div class="ps" style="margin-top:4px">${p.codNo?`<span class="cod" id="dCod">COD No. ${esc(p.codNo)}</span>`:''}${p.adt!=null?`<span class="tier" id="dAdt">ADT ${money(p.adt,true)}</span>`:''}${p.nickname?`<span>“${esc(p.nickname)}”</span>`:''}${bd?`<span class="dim" id="dDob">${I('cake','sm')} ${bd.d} ${MON[bd.m-1]}${bd.y?' '+bd.y+' · age '+ageOf(p):''}</span>`:''}${p.stays.some(s=>inHouseStay(s,t))?'<span class="pill">In-house</span>':''}</div>
      ${p.tags.length?`<div class="ps" style="margin-top:6px">${p.tags.map(x=>`<span class="tag">#${esc(x)}</span>`).join('')}</div>`:''}</div></div>
     ${contactBtns?`<div class="contact-btns">${contactBtns}</div>`:''}
     <div class="btns" style="margin-top:14px"><button type="button" class="btn sm" data-act="addVisit" data-id="${esc(p.id)}" id="btnAddVisit">${I('chip','sm')} Visit</button><button type="button" class="btn sm" data-act="addStay" data-id="${esc(p.id)}" id="btnAddStay">${I('bed','sm')} Stay</button><button type="button" class="btn sm ghost" data-act="contacted" data-id="${esc(p.id)}">${I('check','sm')} Contacted</button><button type="button" class="btn sm ghost" data-act="editPatron" data-id="${esc(p.id)}" id="btnEdit">${I('edit','sm')} Edit</button></div>
@@ -641,8 +646,9 @@ const chipRow=(target,arr,mode)=>`<div class="chips">${arr.map(v=>`<button type=
 function patronForm(p){const isNew=!p;p=p||normPatron({name:'x'});if(isNew)p.name='';const pr=p.prefs;
   const bd=p.birthday||'',fullBd=/^(19|20)\d\d-/.test(bd)?bd:'',partialBd=bd&&!fullBd?bd:'';
   const more=[p.cname,p.nickname,p.phones.length>1,p.whatsapp,p.wechat,p.email,p.tags.length,pr.room,pr.bed,pr.smoking,pr.games,pr.food,pr.other,p.notes,p.followUp].filter(Boolean).length;
-  return `<form id="patronForm" novalidate autocomplete="off">
+  return `<form id="patronForm" novalidate autocomplete="off" data-pid="${isNew?'':esc(p.id)}">
   <label>Name *<input name="name" type="text" value="${esc(p.name)}" autofocus required maxlength="160" placeholder="e.g. Chan Tai Man"></label>
+  <label>COD Patron No.<input name="codNo" id="pCod" type="text" value="${esc(p.codNo)}" maxlength="40" autocapitalize="characters" autocorrect="off" spellcheck="false" placeholder="letters & numbers"></label><div class="hint warn" id="codWarn" role="status"></div>
   <label>Date of birth<input name="dob" id="pDob" type="date" value="${esc(fullBd)}" min="1900-01-01" max="${today()}"></label>
   ${partialBd?`<p class="hint" id="partialBd">Saved birthday: ${fmtD(partialBd)} (year unknown) — kept unless you enter a full date. <button type="button" class="linkbtn tiny" data-act="clearPartialBd">Remove</button><input type="hidden" name="keepBd" value="${esc(partialBd)}"></p>`:''}
   <label>Phone number<input name="phone" id="pPhone" type="tel" value="${esc(p.phones[0]||'')}" maxlength="40" placeholder="+853 6xxx xxxx"></label>
@@ -666,6 +672,7 @@ function patronForm(p){const isNew=!p;p=p||normPatron({name:'x'});if(isNew)p.nam
   </details>
   <div class="ferr"></div><div class="actions"><button type="button" class="btn ghost" data-act="closeModal">Cancel</button><button type="submit" class="btn" id="savePatron">Save</button></div></form>`}
 function readPatronForm(f,p){const g=n=>f.elements[n]?f.elements[n].value.trim():'';const name=g('name');if(!name)return 'Name is required.';
+  const codNo=g('codNo');if(codNo&&!/^[A-Za-z0-9-]+$/.test(codNo))return 'COD Patron No. can only contain letters, numbers and dashes.';
   let birthday='';const dob=g('dob');
   if(dob){if(!isDate(dob)||!/^(19|20)\d\d-/.test(dob))return 'Date of birth is invalid.';if(dob>today())return 'Date of birth cannot be in the future.';birthday=dob}
   else if(g('keepBd'))birthday=g('keepBd');
@@ -673,12 +680,13 @@ function readPatronForm(f,p){const g=n=>f.elements[n]?f.elements[n].value.trim()
   const email=g('email');if(email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return 'Email looks invalid.';
   const fu=g('followUp');if(fu&&!isDate(fu))return 'Follow-up date is invalid.';
   const phones=[g('phone'),...g('phones2').split(/[\n;]+/)].map(x=>x.trim()).filter(Boolean).slice(0,8);
-  Object.assign(p,{name,cname:g('cname'),nickname:g('nickname'),phones,whatsapp:g('whatsapp'),wechat:g('wechat'),email,birthday,adt,
+  Object.assign(p,{name,codNo,cname:g('cname'),nickname:g('nickname'),phones,whatsapp:g('whatsapp'),wechat:g('wechat'),email,birthday,adt,
     tags:[...new Set(g('tags').split(',').map(x=>x.trim().replace(/^#/,'')).filter(Boolean))],
     prefs:{room:g('room'),bed:g('bed'),smoking:g('smoking'),games:g('games'),food:g('food'),other:g('other')},notes:g('notes'),followUp:fu,followUpNote:g('followUpNote')});
   return null}
 function openPatronForm(p){const isNew=!p;openModal(isNew?'New patron':'Edit patron',patronForm(p),{onSubmit:f=>{const target=isNew?normPatron({}):p;const err=readPatronForm(f,target);if(err)return err;
-  touch(target);if(isNew){target.created=Date.now();S.data.patrons.push(target)}persist();toast(isNew?'Patron added':'Saved');if(isNew)location.hash='#/p/'+target.id;else render()}})}
+  touch(target);if(isNew){target.created=Date.now();S.data.patrons.push(target)}persist();toast(isNew?'Patron added':'Saved');
+  const d=dupCod(target.codNo,target.id);if(d)toast(`Heads-up: COD No. ${target.codNo} is also used by ${d.name}`,true);if(isNew)location.hash='#/p/'+target.id;else render()}})}
 
 function compRow(c,defDate){c=c||{type:'room',value:'',date:defDate,note:''};
   return `<div class="comp-row"><select name="ctype" aria-label="Comp type">${optList(COMP_TYPES,c.type)}</select><input name="cval" type="text" inputmode="decimal" placeholder="HKD value" value="${c.value===''||c.value==null?'':esc(c.value)}" aria-label="Comp value (HKD)"><button type="button" class="rm" data-act="rmComp" aria-label="Remove comp">✕</button>
@@ -741,7 +749,7 @@ function exampleData(){const t=today(),y=+t.slice(0,4),m=t.slice(5,7),dd=+t.slic
   const ex=(o)=>normPatron(Object.assign({example:true,tags:[]},o,{tags:['Example'].concat(o.tags||[]),notes:'FICTIONAL EXAMPLE PATRON — not a real person.\n'+(o.notes||'')}));
   const c=(type,value,date,note)=>({type,value,date,note});
   return [
-   ex({name:'Chan Tai Man',cname:'陳大文',nickname:'Mr. Chan',adt:12000,phones:['+853 0000 0001'],whatsapp:'+853 0000 0001',wechat:'example_chan',email:'chan@example.com',birthday:`1968-${m}-${pad(bdDay)}`,
+   ex({name:'Chan Tai Man',codNo:'EX0000101',cname:'陳大文',nickname:'Mr. Chan',adt:12000,phones:['+853 0000 0001'],whatsapp:'+853 0000 0001',wechat:'example_chan',email:'chan@example.com',birthday:`1968-${m}-${pad(bdDay)}`,
     tags:['Baccarat','HK'],prefs:{room:'Nüwa Suite',bed:'King',smoking:'Non-smoking',food:'Cantonese; no shellfish',games:'Baccarat',other:'Likes the same mass-floor table by the window.'},
     notes:'Arrives by ferry from HK Friday evenings. Likes a birthday cake from Jade Dragon.',followUp:t,followUpNote:'Confirm birthday dinner at Jade Dragon',
     visits:[{date:D(-1),endDate:D(2),notes:'Mass floor, very happy with suite.',comps:[c('room',6600,D(-1),'3n Nüwa suite'),c('fnb',2400,D(-1),'Jade Dragon dinner for 2'),c('limo',800,D(-1),'Ferry pickup')]},
@@ -749,22 +757,22 @@ function exampleData(){const t=today(),y=+t.slice(0,4),m=t.slice(5,7),dd=+t.slic
      {date:D(-120),comps:[c('room',4400,D(-120),'2n suite'),c('ferry',600,D(-120),'Ferry tickets')]}],
     stays:[{property:'Nüwa',roomType:'Suite',roomNo:'3801',checkIn:D(-1),checkOut:D(2),comp:'Comped, late checkout'},{property:'Nüwa',roomType:'Deluxe King',roomNo:'3512',checkIn:D(-35),checkOut:D(-34),comp:'Comped'}],
     contacts:[{date:D(-5),channel:'WhatsApp',note:'Confirmed arrival and suite.'}]}),
-   ex({name:'Wong Siu Ming',cname:'黃小明',adt:6500,phones:['+852 0000 0002'],wechat:'example_wong',birthday:`1979-${m}-${pad(bdDay2)}`,tags:['Referral'],
+   ex({name:'Wong Siu Ming',codNo:'EX0000102',cname:'黃小明',adt:6500,phones:['+852 0000 0002'],wechat:'example_wong',birthday:`1979-${m}-${pad(bdDay2)}`,tags:['Referral'],
     prefs:{room:'Morpheus Deluxe',bed:'King',smoking:'Smoking',food:'Japanese, single malt',games:'Baccarat, Sic Bo'},followUp:D(-3),followUpNote:'Send Morpheus room confirmation',
     visits:[{date:D(-20),comps:[c('room',3800,D(-20),'2n Morpheus'),c('fnb',900,D(-20),'Noodle bar')]}],
     stays:[{property:'Morpheus',roomType:'Deluxe King',checkIn:D(2),checkOut:D(5),comp:'Room comp approved'},{property:'Morpheus',roomType:'Deluxe King',checkIn:D(-20),checkOut:D(-18)}]}),
-   ex({name:'Lee Siu Mui',cname:'李小梅',nickname:'May',adt:1800,phones:['+86 000 0000 0003'],wechat:'example_may',birthday:'1990-03-08',tags:['Mainland','Slots'],prefs:{room:'Deluxe Twin',bed:'Twin',smoking:'Non-smoking',food:'Vegetarian',games:'Slots, Roulette'},
+   ex({name:'Lee Siu Mui',codNo:'EX0000103',cname:'李小梅',nickname:'May',adt:1800,phones:['+86 000 0000 0003'],wechat:'example_may',birthday:'1990-03-08',tags:['Mainland','Slots'],prefs:{room:'Deluxe Twin',bed:'Twin',smoking:'Non-smoking',food:'Vegetarian',games:'Slots, Roulette'},
     followUp:D(4),followUpNote:'Ask about Golden Week plans',visits:[{date:D(-50),comps:[c('fnb',600,D(-50),'Buffet x2')]}],
     stays:[{property:'The Countdown',roomType:'Deluxe Twin',checkIn:D(5),checkOut:D(7)}]}),
-   ex({name:'Tanaka Hiroshi',nickname:'Tanaka-san',adt:4200,phones:['+81 00 0000 0004'],email:'tanaka@example.com',birthday:'1975-11-21',tags:['Japan','Blackjack'],prefs:{room:'Grand Hyatt Deluxe',bed:'King',smoking:'Non-smoking',food:'Sushi, sake',games:'Blackjack'},
+   ex({name:'Tanaka Hiroshi',codNo:'EX0000104',nickname:'Tanaka-san',adt:4200,phones:['+81 00 0000 0004'],email:'tanaka@example.com',birthday:'1975-11-21',tags:['Japan','Blackjack'],prefs:{room:'Grand Hyatt Deluxe',bed:'King',smoking:'Non-smoking',food:'Sushi, sake',games:'Blackjack'},
     followUp:D(-10),followUpNote:'Win-back offer: 2n room',visits:[{date:D(-75),comps:[c('room',3000,D(-75),'2n GH deluxe'),c('fnb',800,D(-75),'Dinner credit')]},{date:D(-160)}],
     stays:[{property:'Grand Hyatt Macau',roomType:'Deluxe King',checkIn:D(-75),checkOut:D(-73)}]}),
-   ex({name:'Ho Ka Wai',cname:'何家偉',adt:2500,phones:['+853 0000 0005'],birthday:`1985-${m}-${pad(Math.max(1,Math.min(28,dd+6)))}`,tags:['Local'],prefs:{room:'Deluxe King',smoking:'Non-smoking',games:'Baccarat'},
+   ex({name:'Ho Ka Wai',codNo:'EX0000105',cname:'何家偉',adt:2500,phones:['+853 0000 0005'],birthday:`1985-${m}-${pad(Math.max(1,Math.min(28,dd+6)))}`,tags:['Local'],prefs:{room:'Deluxe King',smoking:'Non-smoking',games:'Baccarat'},
     visits:[{date:D(-2),comps:[c('fnb',400,D(-2),'Noodle bar')]},{date:D(-9)}],
     stays:[{property:'Grand Hyatt Macau',roomType:'Deluxe King',roomNo:'1206',checkIn:D(-2),checkOut:t,comp:'Staycation rate'}]}),
-   ex({name:'Maria Santos',adt:3000,phones:['+63 000 000 0006'],email:'maria@example.com',birthday:'1982-07-02',tags:['Philippines'],prefs:{room:'Deluxe',bed:'King',food:'Portuguese; Vinho Verde',games:'Roulette, Poker'},
+   ex({name:'Maria Santos',codNo:'EX0000106',adt:3000,phones:['+63 000 000 0006'],email:'maria@example.com',birthday:'1982-07-02',tags:['Philippines'],prefs:{room:'Deluxe',bed:'King',food:'Portuguese; Vinho Verde',games:'Roulette, Poker'},
     visits:[{date:D(-130),comps:[c('room',2600,D(-130),'2n Countdown deluxe'),c('spa',900,D(-130))]}],stays:[{property:'The Countdown',roomType:'Deluxe King',checkIn:D(-130),checkOut:D(-128)}]}),
-   ex({name:'Zhang Wei',cname:'張偉',adt:9000,phones:['+86 000 0000 0007'],wechat:'example_zhang',birthday:'1972-01-15',tags:['Mainland','Baccarat'],prefs:{room:'Nüwa Deluxe',bed:'King',smoking:'Smoking',food:'Sichuan',games:'Baccarat'},followUp:D(6),followUpNote:'Invite to year-end party',
+   ex({name:'Zhang Wei',codNo:'EX0000107',cname:'張偉',adt:9000,phones:['+86 000 0000 0007'],wechat:'example_zhang',birthday:'1972-01-15',tags:['Mainland','Baccarat'],prefs:{room:'Nüwa Deluxe',bed:'King',smoking:'Smoking',food:'Sichuan',games:'Baccarat'},followUp:D(6),followUpNote:'Invite to year-end party',
     visits:[{date:D(-12),endDate:D(-10),comps:[c('room',4400,D(-12),'2n Nüwa deluxe'),c('fnb',1600,D(-11)),c('gift',800,D(-10),'Mooncake set')]},{date:D(-70)}],
     stays:[{property:'Nüwa',roomType:'Deluxe King',roomNo:'2802',checkIn:D(-12),checkOut:D(-10),comp:'Comped'}],contacts:[{date:D(-8),channel:'WeChat',note:'Thanked for visit.'}]})
   ]}
@@ -775,16 +783,16 @@ function exportJson(){const out={app:'patron-book',version:2,exportedAt:new Date
   download(`patron-book-backup-${today()}.json`,JSON.stringify(out,null,1),'application/json');S.meta.lastBackup=today();saveMeta();toast('Backup downloaded — keep it private');render()}
 const csvCell=v=>{if(v==null)return '';if(typeof v==='number')return isFinite(v)?String(Math.round(v*100)/100):'';let s=String(v);if(/^[=+\-@\t\r]/.test(s))s="'"+s;return /[",\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s};
 const toCsv=rows=>'\ufeff'+rows.map(r=>r.map(csvCell).join(',')).join('\r\n');
-function exportCsv(){const h=['ID','Name','Date of birth','Phone','Other phones','ADT (HKD)','Chinese name','Nickname','Tags','WhatsApp','WeChat','Email','Room pref','Bed','Smoking','Food & drinks','Games','Other prefs','Notes','Next follow-up','Follow-up note','Last seen','Visits','Stays','Contacts','Comps 12m (HKD)','Comps all-time (HKD)','Example'];
+function exportCsv(){const h=['ID','Name','COD Patron No.','Date of birth','Phone','Other phones','ADT (HKD)','Chinese name','Nickname','Tags','WhatsApp','WeChat','Email','Room pref','Bed','Smoking','Food & drinks','Games','Other prefs','Notes','Next follow-up','Follow-up note','Last seen','Visits','Stays','Contacts','Comps 12m (HKD)','Comps all-time (HKD)','Example'];
   const rows=[h,...S.data.patrons.map(p=>{const s=stats(p),r=p.prefs;
-    return [p.id,p.name,p.birthday.replace(/^0000/,'----'),p.phones[0]||'',p.phones.slice(1).join('; '),p.adt,p.cname,p.nickname,p.tags.join('; '),p.whatsapp,p.wechat,p.email,r.room,r.bed,r.smoking,r.food,r.games,r.other,p.notes,p.followUp,p.followUpNote,s.lastSeen,s.visits,s.stays,p.contacts.length,s.comp12,s.compAll,p.example?'yes':'']})];
+    return [p.id,p.name,p.codNo,p.birthday.replace(/^0000/,'----'),p.phones[0]||'',p.phones.slice(1).join('; '),p.adt,p.cname,p.nickname,p.tags.join('; '),p.whatsapp,p.wechat,p.email,r.room,r.bed,r.smoking,r.food,r.games,r.other,p.notes,p.followUp,p.followUpNote,s.lastSeen,s.visits,s.stays,p.contacts.length,s.comp12,s.compAll,p.example?'yes':'']})];
   download(`patron-book-patrons-${today()}.csv`,toCsv(rows),'text/csv;charset=utf-8');toast('Patrons CSV downloaded')}
-function exportActCsv(){const rows=[['Patron ID','Patron','Type','Date','End date','Property','Room','Comp type','Comp value (HKD)','Channel','Notes']];
-  for(const p of S.data.patrons){for(const v of p.visits){rows.push([p.id,p.name,'visit',v.date,v.endDate,'','','','','',v.notes]);
-      for(const c of v.comps)rows.push([p.id,p.name,'comp',c.date||v.date,'','','',COMP_LABEL[c.type],c.value,'',c.note])}
-    for(const s of p.stays)rows.push([p.id,p.name,'stay',s.checkIn,s.checkOut,s.property,[s.roomType,s.roomNo].filter(Boolean).join(' #'),'','','',s.comp]);
-    for(const c of p.contacts)rows.push([p.id,p.name,'contact',c.date,'','','','','',c.channel,c.note])}
-  rows.splice(1,rows.length,...rows.slice(1).sort((a,b)=>b[3].localeCompare(a[3])));
+function exportActCsv(){const rows=[['Patron ID','Patron','COD Patron No.','Type','Date','End date','Property','Room','Comp type','Comp value (HKD)','Channel','Notes']];
+  for(const p of S.data.patrons){for(const v of p.visits){rows.push([p.id,p.name,p.codNo,'visit',v.date,v.endDate,'','','','','',v.notes]);
+      for(const c of v.comps)rows.push([p.id,p.name,p.codNo,'comp',c.date||v.date,'','','',COMP_LABEL[c.type],c.value,'',c.note])}
+    for(const s of p.stays)rows.push([p.id,p.name,p.codNo,'stay',s.checkIn,s.checkOut,s.property,[s.roomType,s.roomNo].filter(Boolean).join(' #'),'','','',s.comp]);
+    for(const c of p.contacts)rows.push([p.id,p.name,p.codNo,'contact',c.date,'','','','','',c.channel,c.note])}
+  rows.splice(1,rows.length,...rows.slice(1).sort((a,b)=>b[4].localeCompare(a[4])));
   download(`patron-book-activity-${today()}.csv`,toCsv(rows),'text/csv;charset=utf-8');toast('Activity CSV downloaded')}
 async function importFile(file){if(!file)return;if(file.size>25e6){toast('File too large',true);return}
   let data;try{data=parseData(await file.text())}catch(e){toast('Not a valid Patron Book backup: '+e.message,true);return}
@@ -910,7 +918,8 @@ document.addEventListener('keydown',e=>{S.lastActivity=Date.now();
   if((e.key==='Enter'||e.key===' ')&&e.target.matches('.prow[data-act]')){e.preventDefault();e.target.click()}});
 $('#lockForm').addEventListener('submit',e=>{e.preventDefault();tryUnlock()});
 $('#pinInput').addEventListener('input',e=>{e.target.value=e.target.value.replace(/\D/g,'').slice(0,6)});
-document.addEventListener('input',e=>{const id=e.target.id;if(id==='q'){S.list.q=e.target.value;renderList()}});
+document.addEventListener('input',e=>{const id=e.target.id;if(id==='q'){S.list.q=e.target.value;renderList()}
+  else if(id==='pCod'){const f=e.target.form,w=$('#codWarn',f);const d=dupCod(e.target.value,f.dataset.pid);w.textContent=d?`⚠ Also used by ${d.name} — you can still save.`:''}});
 document.addEventListener('change',e=>{const id=e.target.id,v=e.target.value;const L=S.list;
   if(id==='fTag'){L.tag=v;renderList()}else if(id==='fSort'){L.sort=v;renderList()}
   else if(id==='sAutoLock'){S.meta.settings.autoLock=+v;saveMeta()}
