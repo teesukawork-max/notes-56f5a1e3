@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#fff4ea">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Debt-Free">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<link rel="apple-touch-icon" sizes="180x180" href="data:image/png;base64,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">
+<title>Debt-Free Tracker</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%B1%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#fff7ef; --bg2:#fdeee2; --card:#ffffff; --ink:#3d3240; --muted:#8a7d86; --line:#f1e3d8;
+  --coral:#ff8a70; --coral-d:#f26d52; --peach:#ffc9a8; --mint:#6cc8a4; --mint-d:#3fae86; --mint-l:#e3f6ee;
+  --lav:#a597e6; --lav-l:#eeeafd; --sun:#ffc861; --sun-l:#fff3d6; --rose-l:#ffe7e1; --red:#e35d5d;
+  --radius:20px; --shadow:0 6px 24px rgba(160,100,70,.10), 0 1px 3px rgba(160,100,70,.08);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:ui-rounded,"SF Pro Rounded","Nunito","Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",Arial,sans-serif;
+  background:radial-gradient(1200px 600px at 10% -10%,#ffe6d3 0,transparent 60%),radial-gradient(900px 500px at 110% 0,#e9e4ff 0,transparent 55%),var(--bg);
+  color:var(--ink);min-height:100vh;-webkit-font-smoothing:antialiased;line-height:1.45}
+button,input,select{font:inherit;color:inherit}
+.wrap{max-width:1180px;margin:0 auto;padding:18px 16px 80px}
+header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:48px;height:48px;border-radius:16px;background:linear-gradient(135deg,var(--peach),var(--coral));display:grid;place-items:center;font-size:26px;box-shadow:var(--shadow)}
+.brand h1{font-size:22px;margin:0;letter-spacing:-.2px}
+.brand p{margin:0;color:var(--muted);font-size:14px}
+.top-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn{border:0;border-radius:14px;padding:10px 16px;cursor:pointer;font-weight:700;font-size:14px;transition:transform .12s,box-shadow .12s,background .12s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--coral);color:#fff;box-shadow:0 4px 12px rgba(242,109,82,.3)}
+.btn-primary:hover{background:var(--coral-d)}
+.btn-mint{background:var(--mint);color:#fff;box-shadow:0 4px 12px rgba(63,174,134,.28)}
+.btn-mint:hover{background:var(--mint-d)}
+.btn-soft{background:#fff;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--line)}
+.btn-soft:hover{background:var(--bg2)}
+.btn-ghost{background:transparent;color:var(--muted);padding:6px 10px}
+.btn-ghost:hover{background:var(--bg2);color:var(--ink)}
+.btn-danger{background:var(--rose-l);color:var(--red)}
+.btn-sm{padding:6px 11px;font-size:13px;border-radius:11px}
+select.pill,input.pill{border:1.5px solid var(--line);background:#fff;border-radius:14px;padding:9px 12px;font-weight:700;font-size:14px}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
+.card h2{font-size:17px;margin:0 0 12px;display:flex;align-items:center;gap:8px}
+.card h2 .sub{font-weight:600;color:var(--muted);font-size:13px;margin-left:auto}
+.grid{display:grid;gap:16px}
+.main-grid{grid-template-columns:1fr;}
+@media(min-width:900px){.main-grid{grid-template-columns:1.35fr 1fr}.span2{grid-column:1 / -1}}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media(min-width:700px){.stats{grid-template-columns:repeat(4,1fr)}}
+.stat{border-radius:18px;padding:14px;background:var(--bg2)}
+.stat .lbl{font-size:12.5px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+.stat .val{font-size:22px;font-weight:800;margin-top:4px;letter-spacing:-.3px;word-break:break-word}
+.stat .hint{font-size:12.5px;color:var(--muted);margin-top:2px}
+@media(max-width:480px){.stat .val{font-size:17.5px}.stat{padding:12px}.freedate{font-size:26px}}
+.stat.c1{background:var(--rose-l)}.stat.c2{background:var(--mint-l)}.stat.c3{background:var(--lav-l)}.stat.c4{background:var(--sun-l)}
+.hero{display:grid;gap:16px;grid-template-columns:1fr;align-items:center;margin-bottom:16px;background:linear-gradient(135deg,#fff 0,#fff6ee 100%)}
+@media(min-width:700px){.hero{grid-template-columns:auto 1fr}}
+.ring-wrap{position:relative;width:150px;height:150px;margin:0 auto}
+.ring-wrap .ring-txt{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.ring-txt b{font-size:30px;display:block;letter-spacing:-.5px}
+.ring-txt span{font-size:12px;color:var(--muted);font-weight:700}
+.hero-info h3{margin:0 0 4px;font-size:15px;color:var(--muted);font-weight:700}
+.freedate{font-size:30px;font-weight:800;letter-spacing:-.5px;margin:0}
+.countdown{display:flex;gap:10px;margin:10px 0 12px;flex-wrap:wrap}
+.cd{background:#fff;border-radius:16px;padding:8px 14px;box-shadow:inset 0 0 0 1.5px var(--line);text-align:center;min-width:84px}
+.cd b{display:block;font-size:24px;line-height:1.1}
+.cd span{font-size:12px;color:var(--muted);font-weight:700}
+.bar{height:14px;background:#f5e9df;border-radius:99px;overflow:hidden;position:relative}
+.bar > i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--mint),#9fe0c4);transition:width .8s cubic-bezier(.2,.8,.2,1)}
+.bar.sm{height:9px}
+.milestones{display:flex;justify-content:space-between;margin-top:6px;font-size:12px;color:var(--muted);font-weight:700}
+.milestones span.hit{color:var(--mint-d)}
+.warn{background:#fff0ec;border:1.5px solid #ffd2c6;color:#b4432c;border-radius:14px;padding:10px 12px;font-size:14px;font-weight:600;margin:10px 0 0;display:flex;gap:8px;align-items:flex-start}
+.info{background:var(--lav-l);color:#4c3f97;border-radius:14px;padding:10px 12px;font-size:14px;font-weight:600;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.debt{border-radius:18px;border:1.5px solid var(--line);padding:14px;margin-bottom:12px;background:#fff;position:relative}
+.debt:last-child{margin-bottom:0}
+.debt-head{display:flex;align-items:center;gap:10px}
+.dot{width:12px;height:12px;border-radius:50%;flex:none}
+.debt-name{font-weight:800;font-size:16px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tag{font-size:11.5px;font-weight:800;border-radius:99px;padding:3px 9px;background:var(--bg2);color:var(--muted);white-space:nowrap}
+.tag.focus{background:var(--coral);color:#fff}
+.tag.done{background:var(--mint);color:#fff}
+.tag.bad{background:var(--rose-l);color:var(--red)}
+.debt-nums{display:flex;justify-content:space-between;gap:8px;margin:10px 0 8px;flex-wrap:wrap}
+.debt-nums .big{font-size:20px;font-weight:800}
+.debt-nums .of{color:var(--muted);font-size:13px;font-weight:600}
+.debt-meta{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted);margin-top:8px}
+.debt-meta b{color:var(--ink)}
+.debt-actions{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.empty{text-align:center;padding:40px 18px}
+.empty .art{font-size:64px;line-height:1}
+.empty h2{justify-content:center;font-size:22px;margin:14px 0 6px}
+.empty p{color:var(--muted);max-width:460px;margin:0 auto 18px}
+.empty .row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.chart-box{width:100%;position:relative}
+.chart-box svg{width:100%;height:auto;display:block;overflow:visible}
+.legend{display:flex;gap:14px;font-size:12.5px;color:var(--muted);font-weight:700;margin-top:6px;flex-wrap:wrap}
+.legend i{display:inline-block;width:14px;height:4px;border-radius:3px;vertical-align:middle;margin-right:5px}
+.tooltip{position:absolute;pointer-events:none;background:var(--ink);color:#fff;font-size:12.5px;padding:6px 9px;border-radius:10px;white-space:nowrap;transform:translate(-50%,-115%);opacity:0;transition:opacity .1s;font-weight:700}
+input[type=range]{width:100%;accent-color:var(--coral);height:28px}
+.whatif-out{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.whatif-out .stat .val{font-size:19px}
+.seg{display:inline-flex;background:var(--bg2);border-radius:14px;padding:4px;gap:4px;width:100%}
+.seg button{flex:1;border:0;background:transparent;border-radius:11px;padding:9px 8px;font-weight:800;cursor:pointer;color:var(--muted);font-size:14px}
+.seg button.on{background:#fff;color:var(--ink);box-shadow:0 2px 8px rgba(160,100,70,.15)}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.field label{font-size:13px;font-weight:800;color:var(--muted)}
+.field input,.field select{border:1.5px solid var(--line);background:#fffdfb;border-radius:13px;padding:11px 12px;font-size:15px;outline:none;width:100%}
+.field input:focus,.field select:focus{border-color:var(--coral);box-shadow:0 0 0 3px rgba(255,138,112,.18)}
+.field .help{font-size:12px;color:var(--muted)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pay-list{list-style:none;margin:0;padding:0;max-height:420px;overflow:auto}
+.pay-list li{display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px dashed var(--line)}
+.pay-list li:last-child{border-bottom:0}
+.pay-list .p-main{flex:1;min-width:0}
+.pay-list .p-name{font-weight:800;font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pay-list .p-date{font-size:12.5px;color:var(--muted)}
+.pay-list .p-amt{font-weight:800;color:var(--mint-d)}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.example-banner{background:repeating-linear-gradient(-45deg,var(--sun-l),var(--sun-l) 12px,#fff8e6 12px,#fff8e6 24px);border:1.5px dashed var(--sun);border-radius:16px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-weight:700;font-size:14px}
+.example-banner span{flex:1;min-width:200px}
+/* modal */
+.modal-bg{position:fixed;inset:0;background:rgba(61,50,64,.38);backdrop-filter:blur(3px);display:none;align-items:flex-end;justify-content:center;z-index:50;padding:0}
+.modal-bg.open{display:flex}
+@media(min-width:600px){.modal-bg{align-items:center;padding:20px}}
+.modal{background:#fff;border-radius:24px 24px 0 0;width:100%;max-width:480px;padding:20px 18px calc(20px + env(safe-area-inset-bottom));max-height:92vh;overflow:auto;animation:up .22s ease-out}
+@media(min-width:600px){.modal{border-radius:24px}}
+@keyframes up{from{transform:translateY(30px);opacity:0}to{transform:none;opacity:1}}
+.modal h3{margin:0 0 14px;font-size:19px}
+.modal .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:6px}
+/* celebration */
+.celebrate{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:60;background:rgba(255,247,239,.7);backdrop-filter:blur(2px)}
+.celebrate.open{display:flex}
+.celebrate .box{background:#fff;border-radius:28px;padding:28px 24px;text-align:center;box-shadow:var(--shadow);max-width:360px;margin:16px;animation:pop .45s cubic-bezier(.2,1.6,.4,1)}
+.celebrate .emoji{font-size:64px;line-height:1}
+.celebrate h3{font-size:24px;margin:10px 0 6px}
+.celebrate p{color:var(--muted);margin:0 0 16px}
+@keyframes pop{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
+.confetti{position:fixed;top:-20px;width:10px;height:14px;border-radius:3px;z-index:61;pointer-events:none;animation:fall linear forwards}
+@keyframes fall{to{transform:translate3d(var(--dx),110vh,0) rotate(var(--rot));opacity:.9}}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(80px);background:var(--ink);color:#fff;padding:11px 18px;border-radius:14px;font-weight:700;font-size:14px;z-index:70;transition:transform .25s;box-shadow:var(--shadow);max-width:90vw}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.badge{border-radius:14px;padding:6px 10px;font-size:12.5px;font-weight:800;background:#f6eee8;color:#b9aab1}
+.badge.on{background:var(--mint-l);color:var(--mint-d)}
+footer{text-align:center;color:var(--muted);font-size:12.5px;margin-top:26px}
+.hide{display:none!important}
+.fab{position:fixed;right:16px;bottom:18px;z-index:40;border-radius:20px;padding:14px 18px;font-size:15px}
+@media(min-width:900px){.fab{display:none}}
+.set-grid{display:grid;gap:12px}
+.order-list{margin:6px 0 0;padding-left:20px;font-size:13.5px}
+.order-list li{margin:2px 0}
+/* iOS safe areas */
+.wrap{padding-left:calc(16px + env(safe-area-inset-left,0px));padding-right:calc(16px + env(safe-area-inset-right,0px));padding-top:calc(18px + env(safe-area-inset-top,0px));padding-bottom:calc(80px + env(safe-area-inset-bottom,0px))}
+.fab{right:calc(16px + env(safe-area-inset-right,0px));bottom:calc(18px + env(safe-area-inset-bottom,0px))}
+.toast{bottom:calc(22px + env(safe-area-inset-bottom,0px))}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="logo">🌱</div>
+      <div>
+        <h1>Debt-Free Tracker</h1>
+        <p id="greeting">Hi there 👋 one payment at a time.</p>
+      </div>
+    </div>
+    <div class="top-actions">
+      <label class="small muted" for="currencySel" style="font-weight:700">Currency</label>
+      <select id="currencySel" class="pill" aria-label="Currency">
+        <option value="MOP">MOP</option><option value="HKD">HKD</option><option value="MYR">MYR (RM)</option>
+        <option value="USD">USD ($)</option><option value="CNY">CNY (¥)</option><option value="SGD">SGD</option>
+        <option value="EUR">EUR (€)</option><option value="GBP">GBP (£)</option><option value="custom">Custom…</option>
+      </select>
+      <input id="customSym" class="pill hide" style="width:84px" maxlength="6" placeholder="Symbol" aria-label="Custom currency symbol">
+    </div>
+  </header>
+
+  <div id="exampleBanner" class="example-banner hide">
+    <span>🧪 You're viewing <u>EXAMPLE data</u>: these debts aren't real. Explore, then clear it and add your own.</span>
+    <button class="btn btn-soft btn-sm" id="clearExample">Clear example data</button>
+  </div>
+
+  <!-- Empty state -->
+  <section id="emptyState" class="card empty hide">
+    <div class="art">🌷</div>
+    <h2>Your debt-free journey starts here</h2>
+    <p>Add your debts (credit cards, loans, anything you owe) and I'll map out exactly when you'll be free, how much interest you'll pay, and how to get there faster.</p>
+    <div class="row">
+      <button class="btn btn-primary" data-act="add-debt">＋ Add my first debt</button>
+      <button class="btn btn-soft" id="loadExample">🧪 Load example data</button>
+      <button class="btn btn-ghost" data-act="import">Import backup (JSON)</button>
+    </div>
+    <p class="small" style="margin-top:14px">Everything stays on this device (saved in your browser). Nothing is uploaded.</p>
+  </section>
+
+  <main id="app" class="hide">
+    <!-- Hero -->
+    <section class="card hero">
+      <div class="ring-wrap" id="ring"></div>
+      <div class="hero-info">
+        <h3 id="freeLabel">Projected debt-free date</h3>
+        <p class="freedate" id="freeDate">-</p>
+        <div class="countdown" id="countdown"></div>
+        <div class="bar" aria-label="Overall progress"><i id="overallBar" style="width:0%"></i></div>
+        <div class="milestones" id="msRow"><span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100% 🎉</span></div>
+        <div id="globalWarn"></div>
+      </div>
+    </section>
+
+    <section class="stats" style="margin-bottom:16px">
+      <div class="stat c1"><div class="lbl">Debt remaining</div><div class="val" id="sRemain">-</div><div class="hint" id="sRemainHint"></div></div>
+      <div class="stat c2"><div class="lbl">Paid off so far</div><div class="val" id="sPaid">-</div><div class="hint" id="sPaidHint"></div></div>
+      <div class="stat c3"><div class="lbl">Interest still to pay</div><div class="val" id="sInterest">-</div><div class="hint">if you stick to the plan</div></div>
+      <div class="stat c4"><div class="lbl">Monthly payment</div><div class="val" id="sMonthly">-</div><div class="hint" id="sMonthlyHint"></div></div>
+    </section>
+
+    <div class="grid main-grid">
+      <section class="card span2">
+        <h2>📉 Projected balance <span class="sub" id="chartSub"></span></h2>
+        <div class="chart-box" id="chart"></div>
+        <div class="legend"><span><i style="background:var(--coral)"></i>Current plan</span><span id="lgWhatIf"><i style="background:var(--lav)"></i>With “what if” extra</span></div>
+      </section>
+
+      <section class="card">
+        <h2>💳 Your debts <span class="sub"><button class="btn btn-primary btn-sm" data-act="add-debt">＋ Add debt</button></span></h2>
+        <div id="debtList"></div>
+      </section>
+
+      <div class="grid" style="align-content:start">
+        <section class="card">
+          <h2>⚙️ Plan settings</h2>
+          <div class="set-grid">
+            <div class="field" style="margin:0">
+              <label for="extraBudget">Extra monthly budget (on top of minimums)</label>
+              <input id="extraBudget" type="number" min="0" step="50" inputmode="decimal" placeholder="0">
+              <span class="help" id="budgetHelp"></span>
+            </div>
+            <div>
+              <div class="field" style="margin:0 0 6px"><label>Payoff strategy</label></div>
+              <div class="seg" role="tablist">
+                <button id="stAvalanche" data-strategy="avalanche">🏔️ Avalanche</button>
+                <button id="stSnowball" data-strategy="snowball">⛄ Snowball</button>
+              </div>
+              <p class="small muted" id="strategyDesc" style="margin:8px 0 0"></p>
+              <ol class="order-list" id="orderList"></ol>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>✨ What if I paid a bit more?</h2>
+          <div class="field" style="margin-bottom:4px">
+            <label for="whatIf">Extra per month: <span id="whatIfVal" style="color:var(--coral-d)"></span></label>
+            <input id="whatIf" type="range" min="0" max="5000" step="50" value="0">
+          </div>
+          <div class="whatif-out">
+            <div class="stat c2"><div class="lbl">Debt-free sooner</div><div class="val" id="wiSooner">-</div><div class="hint" id="wiDate"></div></div>
+            <div class="stat c4"><div class="lbl">Interest saved</div><div class="val" id="wiSaved">-</div><div class="hint" id="wiInt"></div></div>
+          </div>
+          <div style="margin-top:10px;text-align:right"><button class="btn btn-soft btn-sm" id="applyWhatIf">Add this to my plan</button></div>
+        </section>
+
+        <section class="card">
+          <h2>🧾 Payments <span class="sub"><button class="btn btn-mint btn-sm" data-act="log-payment">＋ Log payment</button></span></h2>
+          <ul class="pay-list" id="payList"></ul>
+        </section>
+
+        <section class="card">
+          <h2>🏅 Milestones</h2>
+          <div class="badges" id="badges" style="margin-top:0"></div>
+        </section>
+
+        <section class="card">
+          <h2>💾 Backup</h2>
+          <p class="small muted" style="margin-top:0">Your data lives only in this browser. Export a backup now and then.</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-soft btn-sm" data-act="export">⬇️ Export JSON</button>
+            <button class="btn btn-soft btn-sm" data-act="import">⬆️ Import JSON</button>
+            <button class="btn btn-danger btn-sm" id="resetAll">Reset everything</button>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+  <footer>Made with care · Projections are estimates (monthly compounding, payments at month end) · Data saved locally</footer>
+</div>
+
+<button class="btn btn-mint fab hide" id="fab" data-act="log-payment">＋ Payment</button>
+<input type="file" id="importFile" accept="application/json,.json" class="hide">
+
+<!-- Debt modal -->
+<div class="modal-bg" id="debtModal" role="dialog" aria-modal="true">
+  <form class="modal" id="debtForm" novalidate>
+    <h3 id="debtModalTitle">Add a debt</h3>
+    <div class="field"><label for="dName">Name</label><input id="dName" required maxlength="60" placeholder="e.g. BOC credit card, Car loan"></div>
+    <div class="row2">
+      <div class="field"><label for="dOriginal">Original amount</label><input id="dOriginal" type="number" min="0" step="0.01" inputmode="decimal" required></div>
+      <div class="field"><label for="dBalance">Current balance</label><input id="dBalance" type="number" min="0" step="0.01" inputmode="decimal" required></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label for="dApr">Interest rate (APR %)</label><input id="dApr" type="number" min="0" max="200" step="0.01" inputmode="decimal" required></div>
+      <div class="field"><label for="dMin">Minimum monthly</label><input id="dMin" type="number" min="0" step="0.01" inputmode="decimal" required></div>
+    </div>
+    <div class="field"><label for="dDue">Due day of month (optional)</label><input id="dDue" type="number" min="1" max="31" step="1" inputmode="numeric" placeholder="e.g. 15"></div>
+    <div id="debtFormErr" class="warn hide"></div>
+    <div class="actions">
+      <button type="button" class="btn btn-ghost" data-close>Cancel</button>
+      <button type="submit" class="btn btn-primary">Save debt</button>
+    </div>
+  </form>
+</div>
+
+<!-- Payment modal -->
+<div class="modal-bg" id="payModal" role="dialog" aria-modal="true">
+  <form class="modal" id="payForm" novalidate>
+    <h3>Log a payment 💪</h3>
+    <div class="field"><label for="pDebt">Debt</label><select id="pDebt"></select></div>
+    <div class="row2">
+      <div class="field"><label for="pDate">Date</label><input id="pDate" type="date" required></div>
+      <div class="field"><label for="pAmount">Amount</label><input id="pAmount" type="number" min="0.01" step="0.01" inputmode="decimal" required></div>
+    </div>
+    <div class="field"><label for="pNote">Note (optional)</label><input id="pNote" maxlength="80" placeholder="e.g. bonus month!"></div>
+    <p class="small muted" style="margin-top:-4px">The full amount reduces the current balance. (If part of it went to interest, just update the balance on the debt afterwards.)</p>
+    <div id="payFormErr" class="warn hide"></div>
+    <div class="actions">
+      <button type="button" class="btn btn-ghost" data-close>Cancel</button>
+      <button type="submit" class="btn btn-mint">Save payment</button>
+    </div>
+  </form>
+</div>
+
+<!-- Confirm modal -->
+<div class="modal-bg" id="confirmModal" role="dialog" aria-modal="true">
+  <div class="modal">
+    <h3 id="confirmTitle">Are you sure?</h3>
+    <p class="muted" id="confirmMsg" style="margin-top:0"></p>
+    <div class="actions">
+      <button type="button" class="btn btn-ghost" data-close>Cancel</button>
+      <button type="button" class="btn btn-primary" id="confirmOk">Yes</button>
+    </div>
+  </div>
+</div>
+
+<!-- Celebration -->
+<div class="celebrate" id="celebrate">
+  <div class="box">
+    <div class="emoji" id="celEmoji">🎉</div>
+    <h3 id="celTitle">Milestone!</h3>
+    <p id="celMsg"></p>
+    <button class="btn btn-primary" id="celClose">Keep going!</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+var STORE_KEY='debtFreeTracker.v1';
+var COLORS=['#ff8a70','#a597e6','#6cc8a4','#ffc861','#6fb6e8','#f39ac2','#9ccf6a','#e8a36f'];
+var CUR_SYMBOLS={MOP:'MOP',HKD:'HK$',MYR:'RM',USD:'$',CNY:'¥',SGD:'S$',EUR:'€',GBP:'£'};
+var MAX_MONTHS=600; // 50 years cap
+var MILESTONES=[25,50,75,100];
+
+function defaultState(){return {version:1,currency:'MOP',customSymbol:'',extraBudget:0,strategy:'avalanche',debts:[],payments:[],celebrated:[],isExample:false};}
+var state=load();
+var whatIfExtra=0;
+
+function load(){
+  try{var raw=localStorage.getItem(STORE_KEY);if(!raw)return defaultState();return normalize(JSON.parse(raw));}
+  catch(e){console.warn('Could not load saved data',e);return defaultState();}
+}
+function save(){try{localStorage.setItem(STORE_KEY,JSON.stringify(state));}catch(e){toast('⚠️ Could not save (storage full or blocked)');}}
+function num(v,d){v=parseFloat(v);return isFinite(v)?v:(d===undefined?0:d);}
+function normalize(s){
+  var d=defaultState();if(!s||typeof s!=='object')return d;
+  d.currency=typeof s.currency==='string'?s.currency:'MOP';
+  d.customSymbol=typeof s.customSymbol==='string'?s.customSymbol.slice(0,6):'';
+  d.extraBudget=Math.max(0,num(s.extraBudget));
+  d.strategy=s.strategy==='snowball'?'snowball':'avalanche';
+  d.isExample=!!s.isExample;
+  d.celebrated=Array.isArray(s.celebrated)?s.celebrated.filter(function(x){return MILESTONES.indexOf(x)>=0;}):[];
+  d.debts=(Array.isArray(s.debts)?s.debts:[]).filter(function(x){return x&&typeof x==='object';}).map(function(x,i){
+    var due=parseInt(x.dueDay,10);
+    return {id:String(x.id||uid()),name:String(x.name||'Debt '+(i+1)).slice(0,60),original:Math.max(0,num(x.original)),balance:Math.max(0,num(x.balance)),
+      apr:Math.max(0,num(x.apr)),minPayment:Math.max(0,num(x.minPayment)),dueDay:(due>=1&&due<=31)?due:null,color:x.color||COLORS[i%COLORS.length],createdAt:x.createdAt||todayStr()};
+  });
+  var ids={};d.debts.forEach(function(x){ids[x.id]=1;});
+  d.payments=(Array.isArray(s.payments)?s.payments:[]).filter(function(p){return p&&ids[p.debtId]&&num(p.amount)>0;}).map(function(p){
+    return {id:String(p.id||uid()),debtId:String(p.debtId),date:/^\d{4}-\d{2}-\d{2}$/.test(p.date)?p.date:todayStr(),amount:num(p.amount),applied:num(p.applied,num(p.amount)),note:String(p.note||'').slice(0,80)};
+  });
+  return d;
+}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8);}
+function pad(n){return (n<10?'0':'')+n;}
+function todayStr(){var t=new Date();return t.getFullYear()+'-'+pad(t.getMonth()+1)+'-'+pad(t.getDate());}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function sym(){return state.currency==='custom'?(state.customSymbol||'$'):(CUR_SYMBOLS[state.currency]||state.currency);}
+var nf2=new Intl.NumberFormat('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+var nf0=new Intl.NumberFormat('en-US',{maximumFractionDigits:0});
+function money(v,short){
+  var s=sym(),sp=/^[A-Za-z]+$/.test(s)?' ':'';var neg=v<0;v=Math.abs(v);
+  var body;
+  if(short&&v>=1e6)body=(v/1e6).toFixed(1).replace(/\.0$/,'')+'M';
+  else if(short&&v>=1e4)body=(v/1e3).toFixed(1).replace(/\.0$/,'')+'k';
+  else body=short?nf0.format(Math.round(v)):nf2.format(v);
+  return (neg?'−':'')+s+sp+body;
+}
+var MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+var MONTHS_L=['January','February','March','April','May','June','July','August','September','October','November','December'];
+function addMonths(date,n){var d=new Date(date.getFullYear(),date.getMonth(),1);d.setMonth(d.getMonth()+n);var last=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();d.setDate(Math.min(date.getDate(),last));return d;}
+function fmtMonth(d,long){return (long?MONTHS_L:MONTHS)[d.getMonth()]+' '+d.getFullYear();}
+function fmtDate(str){var p=str.split('-');return parseInt(p[2],10)+' '+MONTHS[parseInt(p[1],10)-1]+' '+p[0];}
+function monthsLabel(m){if(m<=0)return '0 months';var y=Math.floor(m/12),r=m%12,out=[];if(y)out.push(y+(y===1?' year':' years'));if(r)out.push(r+(r===1?' month':' months'));return out.join(' ');}
+function ordinal(n){var s=['th','st','nd','rd'],v=n%100;return n+(s[(v-20)%10]||s[v]||s[0]);}
+
+/* ============ SIMULATION ============
+   Month-by-month: each month every open debt accrues interest (APR/12, compounded monthly),
+   then the total budget (sum of ALL minimums + extra) is spent: first each open debt gets its
+   minimum (capped at its balance), then everything left (extra + minimums freed by paid-off
+   debts = "rolling"/"snowballing") goes to the priority debt by strategy, then the next. */
+function orderDebts(list,strategy){
+  return list.slice().sort(function(a,b){
+    if(strategy==='snowball'){if(a.bal!==b.bal)return a.bal-b.bal;return b.apr-a.apr;}
+    if(b.apr!==a.apr)return b.apr-a.apr;return a.bal-b.bal;
+  });
+}
+function simulate(debts,extra,strategy){
+  var ds=debts.map(function(d){return {id:d.id,bal:d.balance,apr:d.apr,r:d.apr/100/12,min:d.minPayment,payoff:d.balance<=0.005?0:null,interest:0};});
+  var budget=ds.reduce(function(s,d){return s+(d.bal>0.005?d.min:0);},0)+Math.max(0,extra);
+  var totals=[ds.reduce(function(s,d){return s+d.bal;},0)];
+  var totalInterest=0,month=0,never=false,stalled=0,prevTotal=totals[0];
+  var firstMonthInterest=ds.reduce(function(s,d){return s+d.bal*d.r;},0);
+  if(totals[0]<=0.005)return {months:0,totals:totals,totalInterest:0,debts:ds,never:false,budget:budget,firstMonthInterest:0};
+  if(budget<=firstMonthInterest+1e-9){never=true;}
+  while(!never&&month<MAX_MONTHS){
+    month++;
+    var open=ds.filter(function(d){return d.bal>0.005;});
+    open.forEach(function(d){var i=d.bal*d.r;d.bal+=i;d.interest+=i;totalInterest+=i;});
+    var pool=budget;
+    open.forEach(function(d){var p=Math.min(d.min,d.bal,pool);d.bal-=p;pool-=p;});
+    var ord=orderDebts(open.filter(function(d){return d.bal>0.005;}),strategy);
+    for(var k=0;k<ord.length&&pool>0.005;k++){var p=Math.min(pool,ord[k].bal);ord[k].bal-=p;pool-=p;}
+    var total=0;
+    ds.forEach(function(d){if(d.bal<=0.005){d.bal=0;if(d.payoff===null)d.payoff=month;}total+=d.bal;});
+    totals.push(total);
+    if(total<=0.005)break;
+    if(total>=prevTotal-0.001){stalled++;if(stalled>24){never=true;break;}}else stalled=0;
+    prevTotal=total;
+  }
+  if(month>=MAX_MONTHS&&totals[totals.length-1]>0.005)never=true;
+  return {months:never?Infinity:month,totals:totals,totalInterest:totalInterest,debts:ds,never:never,budget:budget,firstMonthInterest:firstMonthInterest};
+}
+window.DebtSim={simulate:simulate}; // exposed for testing
+
+/* ============ RENDER ============ */
+var $=function(id){return document.getElementById(id);};
+function totals(){
+  var orig=0,bal=0;state.debts.forEach(function(d){orig+=Math.max(d.original,d.balance);bal+=d.balance;});
+  var paid=Math.max(0,orig-bal);return {orig:orig,bal:bal,paid:paid,pct:orig>0?paid/orig*100:0};
+}
+function render(){
+  var has=state.debts.length>0;
+  $('emptyState').classList.toggle('hide',has);
+  $('app').classList.toggle('hide',!has);
+  $('fab').classList.toggle('hide',!has);
+  $('exampleBanner').classList.toggle('hide',!state.isExample);
+  $('currencySel').value=CUR_SYMBOLS[state.currency]||state.currency==='custom'?state.currency:'custom';
+  $('customSym').classList.toggle('hide',state.currency!=='custom');
+  if(state.currency==='custom')$('customSym').value=state.customSymbol;
+  if(!has)return;
+  var t=totals();
+  var sim=simulate(state.debts,state.extraBudget,state.strategy);
+  var now=new Date();
+  // hero
+  renderRing(t.pct);
+  $('overallBar').style.width=Math.min(100,t.pct).toFixed(1)+'%';
+  var ms=$('msRow').children;for(var i=1;i<ms.length;i++)ms[i].classList.toggle('hit',t.pct>=MILESTONES[i-1]-1e-9);
+  var gw='';
+  if(t.bal<=0.005){
+    $('freeLabel').textContent='Status';$('freeDate').textContent='Debt-free! 🎉';
+    $('countdown').innerHTML='<div class="cd"><b>0</b><span>months to go</span></div>';
+  }else if(sim.never){
+    $('freeLabel').textContent='Projected debt-free date';$('freeDate').textContent='Not at this rate';
+    $('countdown').innerHTML='<div class="cd"><b>∞</b><span>months</span></div>';
+    gw='<div class="warn">⚠️ <span><b>Never paid off at this rate.</b> '+(sim.budget<=sim.firstMonthInterest?'Your monthly payments ('+money(sim.budget)+') don’t even cover the interest being added ('+money(sim.firstMonthInterest)+'/month).':'Your monthly payments ('+money(sim.budget)+') can’t keep up: high-interest balances grow faster than you can pay them down, so the total never reaches zero.')+' Increase your extra budget or minimum payments (try the “What if” slider).</span></div>';
+  }else{
+    var fd=addMonths(now,sim.months);
+    var days=Math.round((fd-new Date(now.getFullYear(),now.getMonth(),now.getDate()))/86400000);
+    $('freeLabel').textContent='Projected debt-free date';$('freeDate').textContent=fmtMonth(fd,true);
+    $('countdown').innerHTML='<div class="cd"><b>'+sim.months+'</b><span>'+(sim.months===1?'month':'months')+'</span></div><div class="cd"><b>'+nf0.format(days)+'</b><span>days to go</span></div>'+
+      (sim.months>=12?'<div class="cd"><b>'+(sim.months/12).toFixed(1)+'</b><span>years</span></div>':'');
+  }
+  var badDebts=state.debts.filter(function(d){return d.balance>0.005&&d.minPayment<=d.balance*d.apr/1200+1e-9;});
+  if(badDebts.length&&!sim.never)gw+='<div class="warn">⚠️ <span>The minimum on <b>'+badDebts.map(function(d){return esc(d.name);}).join(', ')+'</b> doesn’t cover its monthly interest. On its own it would never be paid off. Your plan still works because your extra budget reaches it.</span></div>';
+  $('globalWarn').innerHTML=gw;
+  // stats
+  $('sRemain').textContent=money(t.bal);$('sRemainHint').textContent='across '+state.debts.filter(function(d){return d.balance>0.005;}).length+' open debt(s)';
+  $('sPaid').textContent=money(t.paid);$('sPaidHint').textContent=t.pct.toFixed(1)+'% of '+money(t.orig,true);
+  $('sInterest').textContent=sim.never?'∞':money(sim.totalInterest);
+  var mins=state.debts.reduce(function(s,d){return s+(d.balance>0.005?d.minPayment:0);},0);
+  $('sMonthly').textContent=money(mins+state.extraBudget);$('sMonthlyHint').textContent=money(mins,true)+' min + '+money(state.extraBudget,true)+' extra';
+  // settings
+  if(document.activeElement!==$('extraBudget'))$('extraBudget').value=state.extraBudget||'';
+  $('budgetHelp').textContent='Minimums total '+money(mins)+' → you pay '+money(mins+state.extraBudget)+'/month. Freed-up minimums roll to the next debt.';
+  $('stAvalanche').classList.toggle('on',state.strategy==='avalanche');$('stSnowball').classList.toggle('on',state.strategy==='snowball');
+  $('strategyDesc').textContent=state.strategy==='avalanche'?'Avalanche: extra money goes to the highest interest rate first. Saves the most interest.':'Snowball: extra money goes to the smallest balance first. Quick wins keep you motivated.';
+  var ord=orderDebts(state.debts.filter(function(d){return d.balance>0.005;}).map(function(d){return {id:d.id,name:d.name,bal:d.balance,apr:d.apr};}),state.strategy);
+  $('orderList').innerHTML=ord.map(function(d){return '<li><b>'+esc(d.name)+'</b> <span class="muted">('+(state.strategy==='avalanche'?d.apr+'%':money(d.bal,true))+')</span></li>';}).join('');
+  // debts
+  renderDebts(sim,ord,now);
+  // chart + what-if
+  renderWhatIf(sim,now);
+  // payments
+  renderPayments();
+  renderBadges(t.pct);
+  checkMilestones(t.pct);
+}
+function renderRing(pct){
+  var r=62,c=2*Math.PI*r,p=Math.min(100,Math.max(0,pct));
+  $('ring').innerHTML='<svg viewBox="0 0 150 150" width="150" height="150" aria-hidden="true"><defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6cc8a4"/><stop offset="1" stop-color="#a597e6"/></linearGradient></defs>'+
+    '<circle cx="75" cy="75" r="'+r+'" fill="none" stroke="#f5e9df" stroke-width="14"/>'+
+    '<circle cx="75" cy="75" r="'+r+'" fill="none" stroke="url(#rg)" stroke-width="14" stroke-linecap="round" stroke-dasharray="'+c.toFixed(2)+'" stroke-dashoffset="'+(c*(1-p/100)).toFixed(2)+'" transform="rotate(-90 75 75)" style="transition:stroke-dashoffset .9s"/></svg>'+
+    '<div class="ring-txt"><div><b>'+p.toFixed(p>=10||p===0?0:1)+'%</b><span>paid off</span></div></div>';
+}
+function renderDebts(sim,ord,now){
+  var focusId=ord.length?ord[0].id:null;
+  var byId={};sim.debts.forEach(function(d){byId[d.id]=d;});
+  var sorted=state.debts.slice().sort(function(a,b){
+    var pa=a.balance<=0.005?1:0,pb=b.balance<=0.005?1:0;if(pa!==pb)return pa-pb;
+    var ia=ord.findIndex(function(x){return x.id===a.id;}),ib=ord.findIndex(function(x){return x.id===b.id;});return ia-ib;
+  });
+  $('debtList').innerHTML=sorted.map(function(d){
+    var orig=Math.max(d.original,d.balance),paid=orig-d.balance,pct=orig>0?paid/orig*100:0;
+    var s=byId[d.id],done=d.balance<=0.005,tag='',when='';
+    var monthlyInt=d.balance*d.apr/1200,bad=!done&&d.minPayment<=monthlyInt+1e-9;
+    if(done){tag='<span class="tag done">Paid off ✓</span>';when='Paid off 🎉';}
+    else{
+      if(d.id===focusId)tag='<span class="tag focus">Focus 🎯</span>';
+      if(s&&s.payoff!==null&&!sim.never)when=fmtMonth(addMonths(now,s.payoff))+' <span class="muted">('+monthsLabel(s.payoff)+')</span>';
+      else when='<span style="color:var(--red)">Never at this rate</span>';
+      if(bad)tag+=' <span class="tag bad">Min &lt; interest</span>';
+    }
+    var due='';
+    if(d.dueDay&&!done){
+      var t=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+      var nd=new Date(t.getFullYear(),t.getMonth(),Math.min(d.dueDay,new Date(t.getFullYear(),t.getMonth()+1,0).getDate()));
+      if(nd<t)nd=new Date(t.getFullYear(),t.getMonth()+1,Math.min(d.dueDay,new Date(t.getFullYear(),t.getMonth()+2,0).getDate()));
+      var dd=Math.round((nd-t)/86400000);
+      due='<span>Due: <b>'+ordinal(d.dueDay)+'</b> ('+(dd===0?'today!':'in '+dd+' day'+(dd===1?'':'s'))+')</span>';
+    }
+    return '<div class="debt" data-id="'+esc(d.id)+'">'+
+      '<div class="debt-head"><span class="dot" style="background:'+esc(d.color)+'"></span><span class="debt-name" title="'+esc(d.name)+'">'+esc(d.name)+'</span>'+tag+'</div>'+
+      '<div class="debt-nums"><div><div class="big">'+money(d.balance)+'</div><div class="of">left of '+money(orig)+'</div></div>'+
+      '<div style="text-align:right"><div class="big" style="color:var(--mint-d)">'+pct.toFixed(0)+'%</div><div class="of">paid off</div></div></div>'+
+      '<div class="bar sm"><i style="width:'+Math.min(100,pct).toFixed(1)+'%;background:linear-gradient(90deg,'+esc(d.color)+',#ffe3d3)"></i></div>'+
+      '<div class="debt-meta"><span>APR <b>'+d.apr+'%</b></span><span>Min <b>'+money(d.minPayment)+'</b>/mo</span>'+due+
+      (!done?'<span>Interest ≈ <b>'+money(monthlyInt)+'</b>/mo</span>':'')+'<span>Payoff: <b>'+when+'</b></span></div>'+
+      (bad?'<div class="warn" style="margin-top:8px">⚠️ <span>Minimum payment doesn’t cover the ~'+money(monthlyInt)+' monthly interest. Paying only the minimum, this debt would <b>never be paid off at this rate</b>.</span></div>':'')+
+      '<div class="debt-actions">'+(!done?'<button class="btn btn-mint btn-sm" data-act="pay" data-id="'+esc(d.id)+'">＋ Payment</button>':'')+
+      '<button class="btn btn-soft btn-sm" data-act="edit" data-id="'+esc(d.id)+'">Edit</button>'+
+      '<button class="btn btn-ghost btn-sm" data-act="del" data-id="'+esc(d.id)+'">Delete</button></div></div>';
+  }).join('');
+}
+function renderWhatIf(base,now){
+  var t=totals();var slider=$('whatIf');
+  var maxV=Math.max(1000,Math.ceil(t.bal/10/100)*100);maxV=Math.min(maxV,20000);
+  slider.max=maxV;slider.step=maxV>5000?100:50;
+  if(whatIfExtra>maxV)whatIfExtra=maxV;slider.value=whatIfExtra;
+  $('whatIfVal').textContent='+'+money(whatIfExtra)+'/month';
+  var wi=whatIfExtra>0?simulate(state.debts,state.extraBudget+whatIfExtra,state.strategy):null;
+  if(!wi){
+    $('wiSooner').textContent='-';$('wiDate').textContent='Drag the slider to explore';
+    $('wiSaved').textContent='-';$('wiInt').textContent='';
+  }else if(wi.never){
+    $('wiSooner').textContent='Still never';$('wiDate').textContent='Payments still don’t cover interest';$('wiSaved').textContent='-';$('wiInt').textContent='';
+  }else{
+    var d=wi.months;
+    $('wiDate').textContent='Debt-free by '+fmtMonth(addMonths(now,d),false);
+    if(base.never){$('wiSooner').textContent='Becomes possible!';$('wiSaved').textContent='∞ → '+money(wi.totalInterest,true);$('wiInt').textContent='total interest';}
+    else{
+      var diff=base.months-d;$('wiSooner').textContent=diff>0?monthsLabel(diff):'Same month';
+      $('wiSaved').textContent=money(Math.max(0,base.totalInterest-wi.totalInterest));$('wiInt').textContent='Interest: '+money(wi.totalInterest,true)+' vs '+money(base.totalInterest,true);
+    }
+  }
+  $('applyWhatIf').disabled=whatIfExtra<=0;$('applyWhatIf').style.opacity=whatIfExtra>0?1:.5;
+  $('lgWhatIf').style.display=wi&&!wi.never?'':'none';
+  renderChart(base,wi&&!wi.never?wi:null,now);
+}
+function renderChart(base,wi,now){
+  var box=$('chart');
+  var W=Math.max(300,Math.round(box.clientWidth||700)),H=W<500?220:260,pl=W<500?46:58,pr=14,pt=14,pb=30;
+  var series=base.totals.slice();
+  if(base.never){series=series.slice(0,1);var s2=simulateCapped(120);series=s2;}
+  var n=Math.max(series.length,wi?wi.totals.length:0);
+  if(n<2)n=2;
+  var maxY=Math.max.apply(null,series.concat(wi?wi.totals:[]))||1;
+  maxY=niceCeil(maxY);
+  var x=function(i){return pl+(W-pl-pr)*i/(n-1);},y=function(v){return pt+(H-pt-pb)*(1-v/maxY);};
+  var path=function(arr){return arr.map(function(v,i){return (i?'L':'M')+x(i).toFixed(1)+','+y(v).toFixed(1);}).join('');};
+  var g='';
+  for(var k=0;k<=4;k++){var v=maxY*k/4,yy=y(v);g+='<line x1="'+pl+'" x2="'+(W-pr)+'" y1="'+yy+'" y2="'+yy+'" stroke="#f3e6dc" stroke-dasharray="'+(k?'4 4':'0')+'"/><text x="'+(pl-8)+'" y="'+(yy+4)+'" text-anchor="end" font-size="11" fill="#8a7d86" font-weight="700">'+money(v,true)+'</text>';}
+  var ticks=Math.min(W<500?4:7,n-1),labels='';
+  for(k=0;k<=ticks;k++){var i=Math.round((n-1)*k/ticks),dd=addMonths(now,i);labels+='<text x="'+x(i)+'" y="'+(H-8)+'" text-anchor="middle" font-size="11" fill="#8a7d86" font-weight="700">'+MONTHS[dd.getMonth()]+" '"+String(dd.getFullYear()).slice(2)+'</text>';}
+  var area=path(series)+'L'+x(series.length-1).toFixed(1)+','+y(0)+'L'+x(0)+','+y(0)+'Z';
+  var svg='<svg viewBox="0 0 '+W+' '+H+'" width="'+W+'" height="'+H+'" role="img" aria-label="Projected total balance chart"><defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff8a70" stop-opacity=".35"/><stop offset="1" stop-color="#ff8a70" stop-opacity="0"/></linearGradient></defs>'+g+labels+
+    '<path d="'+area+'" fill="url(#ag)"/>'+
+    (wi?'<path d="'+path(wi.totals)+'" fill="none" stroke="#a597e6" stroke-width="2.5" stroke-dasharray="6 5" stroke-linecap="round"/>':'')+
+    '<path d="'+path(series)+'" fill="none" stroke="#ff8a70" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>'+
+    (!base.never?'<circle cx="'+x(series.length-1)+'" cy="'+y(0)+'" r="6" fill="#6cc8a4" stroke="#fff" stroke-width="2.5"/><text x="'+Math.min(W-pr-4,x(series.length-1))+'" y="'+(y(0)-12)+'" text-anchor="end" font-size="12" font-weight="800" fill="#3fae86">Debt-free! 🎉</text>':'')+
+    '<line id="hoverLine" x1="0" x2="0" y1="'+pt+'" y2="'+(H-pb)+'" stroke="#3d3240" stroke-opacity=".25" style="display:none"/><circle id="hoverDot" r="5" fill="#ff8a70" stroke="#fff" stroke-width="2" style="display:none"/>'+
+    '<rect x="'+pl+'" y="'+pt+'" width="'+(W-pl-pr)+'" height="'+(H-pt-pb)+'" fill="transparent" id="hoverRect"/></svg><div class="tooltip" id="tip"></div>';
+  box.innerHTML=svg;
+  $('chartSub').textContent=base.never?'balance keeps growing ⚠️':(base.months+' month'+(base.months===1?'':'s')+' to zero');
+  var rect=$('hoverRect'),tip=$('tip'),hl=$('hoverLine'),hd=$('hoverDot');
+  function move(ev){
+    var r=box.querySelector('svg').getBoundingClientRect(),cx=(ev.touches?ev.touches[0].clientX:ev.clientX)-r.left,sx=cx*W/r.width;
+    var i=Math.round((sx-pl)/(W-pl-pr)*(n-1));i=Math.max(0,Math.min(series.length-1,i));
+    var px=x(i),py=y(series[i]);hl.setAttribute('x1',px);hl.setAttribute('x2',px);hl.style.display='';hd.setAttribute('cx',px);hd.setAttribute('cy',py);hd.style.display='';
+    tip.style.left=(px*r.width/W)+'px';tip.style.top=(py*r.height/H)+'px';tip.style.opacity=1;
+    tip.textContent=fmtMonth(addMonths(now,i))+': '+money(series[i])+(wi&&wi.totals[i]!==undefined?' · what-if '+money(wi.totals[i],true):'');
+  }
+  function leave(){tip.style.opacity=0;hl.style.display='none';hd.style.display='none';}
+  rect.addEventListener('mousemove',move);rect.addEventListener('touchmove',move,{passive:true});rect.addEventListener('touchstart',move,{passive:true});
+  rect.addEventListener('mouseleave',leave);rect.addEventListener('touchend',leave);
+}
+// for "never" case: show 10 years of growth for context
+function simulateCapped(months){
+  var ds=state.debts.map(function(d){return {bal:d.balance,r:d.apr/1200,min:d.minPayment};});
+  var budget=ds.reduce(function(s,d){return s+(d.bal>0.005?d.min:0);},0)+state.extraBudget,out=[ds.reduce(function(s,d){return s+d.bal;},0)];
+  for(var m=0;m<months;m++){var pool=budget;ds.forEach(function(d){if(d.bal>0){d.bal*=1+d.r;}});ds.forEach(function(d){var p=Math.min(d.min,d.bal,pool);d.bal-=p;pool-=p;});
+    ds.slice().sort(function(a,b){return b.r-a.r;}).forEach(function(d){var p=Math.min(pool,d.bal);d.bal-=p;pool-=p;});out.push(ds.reduce(function(s,d){return s+d.bal;},0));}
+  return out;
+}
+function niceCeil(v){var p=Math.pow(10,Math.floor(Math.log10(v))),f=v/p;var nf=f<=1?1:f<=1.5?1.5:f<=2?2:f<=2.5?2.5:f<=3?3:f<=4?4:f<=5?5:f<=6?6:f<=8?8:10;return nf*p;}
+function renderPayments(){
+  var names={},colors={};state.debts.forEach(function(d){names[d.id]=d.name;colors[d.id]=d.color;});
+  var list=state.payments.slice().sort(function(a,b){return a.date<b.date?1:a.date>b.date?-1:0;});
+  if(!list.length){$('payList').innerHTML='<li class="muted small" style="justify-content:center;border:0;padding:18px 0">No payments logged yet. Every payment counts! 💪</li>';return;}
+  var total=list.reduce(function(s,p){return s+p.amount;},0);
+  $('payList').innerHTML='<li class="small muted" style="border:0;padding-top:0">'+list.length+' payment(s) · '+money(total)+' total</li>'+list.map(function(p){
+    return '<li><span class="dot" style="background:'+esc(colors[p.debtId]||'#ccc')+'"></span><div class="p-main"><div class="p-name">'+esc(names[p.debtId]||'Unknown')+'</div><div class="p-date">'+fmtDate(p.date)+(p.note?' · '+esc(p.note):'')+'</div></div><span class="p-amt">−'+money(p.amount)+'</span><button class="btn btn-ghost btn-sm" data-act="del-pay" data-id="'+esc(p.id)+'" title="Delete payment" aria-label="Delete payment">✕</button></li>';
+  }).join('');
+}
+var MS_TEXT={25:['🌱','25% paid off!','A quarter of the way there. Your future self is already thanking you!'],
+  50:['🌻','Halfway there!','50% gone! The hardest part is behind you. Keep that momentum!'],
+  75:['🚀','75% paid off!','Three quarters done! The finish line is in sight.'],
+  100:['🎉','DEBT-FREE!','You did it! Every single cent paid off. Time to celebrate (responsibly 😉).']};
+function renderBadges(pct){
+  $('badges').innerHTML=MILESTONES.map(function(m){var on=pct>=m-1e-9;return '<span class="badge'+(on?' on':'')+'">'+(on?MS_TEXT[m][0]:'🔒')+' '+m+'%</span>';}).join('');
+}
+function checkMilestones(pct){
+  if(state.isExample)return; // no surprise confetti for example data
+  var reached=MILESTONES.filter(function(m){return pct>=m-1e-9&&state.celebrated.indexOf(m)<0;});
+  if(!reached.length)return;
+  var top=reached[reached.length-1];
+  state.celebrated=state.celebrated.concat(reached);save();
+  celebrate(top);
+}
+function celebrate(m){
+  var t=MS_TEXT[m];$('celEmoji').textContent=t[0];$('celTitle').textContent=t[1];$('celMsg').textContent=t[2];
+  $('celebrate').classList.add('open');confetti(m===100?160:90);
+}
+function confetti(n){
+  if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  var cols=COLORS.concat(['#ffffff']);
+  for(var i=0;i<n;i++){
+    var c=document.createElement('div');c.className='confetti';
+    c.style.left=Math.random()*100+'vw';c.style.background=cols[i%cols.length];
+    c.style.setProperty('--dx',(Math.random()*200-100)+'px');c.style.setProperty('--rot',(Math.random()*1080-540)+'deg');
+    c.style.animationDuration=(2.2+Math.random()*2.2)+'s';c.style.animationDelay=(Math.random()*.6)+'s';
+    if(Math.random()<.4){c.style.borderRadius='50%';c.style.width=c.style.height='9px';}
+    document.body.appendChild(c);setTimeout(function(el){el.remove();},5200,c);
+  }
+}
+
+/* ============ MODALS & ACTIONS ============ */
+var editingId=null,confirmFn=null;
+function openModal(id){$(id).classList.add('open');var f=$(id).querySelector('input,select');if(f&&window.innerWidth>600)setTimeout(function(){f.focus();},50);}
+function closeModals(){document.querySelectorAll('.modal-bg.open').forEach(function(m){m.classList.remove('open');});}
+function confirmBox(title,msg,okText,fn){$('confirmTitle').textContent=title;$('confirmMsg').textContent=msg;$('confirmOk').textContent=okText||'Yes';confirmFn=fn;openModal('confirmModal');}
+function openDebt(id){
+  editingId=id||null;var d=id?state.debts.find(function(x){return x.id===id;}):null;
+  $('debtModalTitle').textContent=d?'Edit debt':'Add a debt';
+  $('dName').value=d?d.name:'';$('dOriginal').value=d?d.original:'';$('dBalance').value=d?d.balance:'';
+  $('dApr').value=d?d.apr:'';$('dMin').value=d?d.minPayment:'';$('dDue').value=d&&d.dueDay?d.dueDay:'';
+  $('debtFormErr').classList.add('hide');openModal('debtModal');
+}
+function openPay(debtId){
+  var open=state.debts.filter(function(d){return d.balance>0.005;});
+  if(!open.length){toast('All debts are paid off! 🎉');return;}
+  $('pDebt').innerHTML=open.map(function(d){return '<option value="'+esc(d.id)+'">'+esc(d.name)+' ('+money(d.balance)+' left)</option>';}).join('');
+  if(debtId)$('pDebt').value=debtId;
+  $('pDate').value=todayStr();$('pAmount').value='';$('pNote').value='';$('payFormErr').classList.add('hide');
+  var sel=state.debts.find(function(d){return d.id===$('pDebt').value;});if(sel)$('pAmount').placeholder=nf2.format(sel.minPayment);
+  openModal('payModal');
+}
+function showErr(el,msg){el.innerHTML='⚠️ <span>'+esc(msg)+'</span>';el.classList.remove('hide');}
+$('debtForm').addEventListener('submit',function(e){
+  e.preventDefault();var err=$('debtFormErr');
+  var name=$('dName').value.trim(),orig=parseFloat($('dOriginal').value),bal=parseFloat($('dBalance').value),apr=parseFloat($('dApr').value),min=parseFloat($('dMin').value),due=$('dDue').value.trim();
+  if(!name)return showErr(err,'Please give the debt a name.');
+  if(!isFinite(bal)||bal<0)return showErr(err,'Current balance must be 0 or more.');
+  if(!isFinite(orig)||orig<=0)orig=bal;
+  if(orig<bal)return showErr(err,'Original amount can’t be less than the current balance (it may have grown with interest; set original = current if so).');
+  if(!isFinite(apr)||apr<0||apr>200)return showErr(err,'Interest rate should be between 0 and 200%.');
+  if(!isFinite(min)||min<0)return showErr(err,'Minimum payment must be 0 or more.');
+  var dueN=null;if(due){dueN=parseInt(due,10);if(!(dueN>=1&&dueN<=31))return showErr(err,'Due day must be between 1 and 31.');}
+  if(editingId){var d=state.debts.find(function(x){return x.id===editingId;});Object.assign(d,{name:name,original:orig,balance:bal,apr:apr,minPayment:min,dueDay:dueN});toast('Debt updated ✓');}
+  else{var used=state.debts.map(function(x){return x.color;}),col=COLORS.find(function(c){return used.indexOf(c)<0;})||COLORS[state.debts.length%COLORS.length];
+    state.debts.push({id:uid(),name:name,original:orig,balance:bal,apr:apr,minPayment:min,dueDay:dueN,color:col,createdAt:todayStr()});toast('Debt added ✓');}
+  save();closeModals();render();
+});
+$('pDebt').addEventListener('change',function(){var d=state.debts.find(function(x){return x.id===this.value;},this);if(d)$('pAmount').placeholder=nf2.format(d.minPayment);});
+$('payForm').addEventListener('submit',function(e){
+  e.preventDefault();var err=$('payFormErr');
+  var d=state.debts.find(function(x){return x.id===$('pDebt').value;}),amt=parseFloat($('pAmount').value),date=$('pDate').value;
+  if(!d)return showErr(err,'Choose a debt.');
+  if(!isFinite(amt)||amt<=0)return showErr(err,'Enter an amount greater than 0.');
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(date))return showErr(err,'Choose a valid date.');
+  var applied=Math.min(amt,d.balance);d.balance=Math.max(0,+(d.balance-amt).toFixed(2));
+  state.payments.push({id:uid(),debtId:d.id,date:date,amount:amt,applied:applied,note:$('pNote').value.trim()});
+  save();closeModals();
+  toast(d.balance<=0.005?'🎉 '+d.name+' is PAID OFF!':'Payment logged: '+money(amt)+' 💪');
+  if(d.balance<=0.005&&!state.isExample)confetti(70);
+  render();
+});
+$('confirmOk').addEventListener('click',function(){var f=confirmFn;confirmFn=null;closeModals();if(f)f();});
+document.addEventListener('click',function(e){
+  var t=e.target.closest('[data-act],[data-close],[data-strategy]');if(!t)return;
+  if(t.hasAttribute('data-close')){closeModals();return;}
+  if(t.dataset.strategy){state.strategy=t.dataset.strategy;save();render();return;}
+  var id=t.dataset.id;
+  switch(t.dataset.act){
+    case 'add-debt':openDebt();break;
+    case 'edit':openDebt(id);break;
+    case 'pay':openPay(id);break;
+    case 'log-payment':openPay();break;
+    case 'del':var d=state.debts.find(function(x){return x.id===id;});
+      confirmBox('Delete “'+d.name+'”?','This removes the debt and its payment history. This can’t be undone (export a backup first if unsure).','Delete',function(){
+        state.debts=state.debts.filter(function(x){return x.id!==id;});state.payments=state.payments.filter(function(p){return p.debtId!==id;});save();render();toast('Debt deleted');});break;
+    case 'del-pay':var p=state.payments.find(function(x){return x.id===id;});
+      confirmBox('Delete this payment?','The '+money(p.amount)+' will be added back to the debt’s balance.','Delete',function(){
+        var dd=state.debts.find(function(x){return x.id===p.debtId;});if(dd)dd.balance=+(dd.balance+(p.applied||p.amount)).toFixed(2);
+        state.payments=state.payments.filter(function(x){return x.id!==id;});save();render();toast('Payment removed');});break;
+    case 'export':exportData();break;
+    case 'import':$('importFile').value='';$('importFile').click();break;
+  }
+});
+document.querySelectorAll('.modal-bg').forEach(function(m){m.addEventListener('click',function(e){if(e.target===m)closeModals();});});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeModals();$('celebrate').classList.remove('open');}});
+$('celClose').addEventListener('click',function(){$('celebrate').classList.remove('open');});
+$('extraBudget').addEventListener('input',function(){state.extraBudget=Math.max(0,num(this.value));save();render();});
+$('whatIf').addEventListener('input',function(){whatIfExtra=num(this.value);renderWhatIf(simulate(state.debts,state.extraBudget,state.strategy),new Date());});
+$('applyWhatIf').addEventListener('click',function(){if(whatIfExtra<=0)return;state.extraBudget+=whatIfExtra;whatIfExtra=0;save();render();toast('Extra budget updated ✓');});
+$('currencySel').addEventListener('change',function(){state.currency=this.value;save();render();if(this.value==='custom')$('customSym').focus();});
+$('customSym').addEventListener('input',function(){state.customSymbol=this.value.trim().slice(0,6);save();render();});
+$('loadExample').addEventListener('click',loadExample);
+$('clearExample').addEventListener('click',function(){confirmBox('Clear example data?','This removes the example debts so you can start fresh with your own.','Clear',function(){var c=state.currency,cs=state.customSymbol;state=defaultState();state.currency=c;state.customSymbol=cs;save();render();});});
+$('resetAll').addEventListener('click',function(){confirmBox('Reset everything?','All debts, payments and settings on this device will be erased. Export a backup first if you might want them back.','Erase all',function(){state=defaultState();save();render();toast('All data cleared');});});
+$('importFile').addEventListener('change',function(){
+  var f=this.files&&this.files[0];if(!f)return;var r=new FileReader();
+  r.onload=function(){try{var data=JSON.parse(r.result);if(!data||!Array.isArray(data.debts))throw new Error('No debts array found');
+      var ns=normalize(data);confirmBox('Import backup?','Found '+ns.debts.length+' debt(s) and '+ns.payments.length+' payment(s). This replaces your current data.','Import',function(){state=ns;save();render();toast('Backup imported ✓');});}
+    catch(e){toast('⚠️ That file isn’t a valid Debt-Free Tracker backup');}};
+  r.readAsText(f);
+});
+function exportData(){
+  var data=Object.assign({app:'debt-free-tracker',exportedAt:new Date().toISOString()},state);
+  var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download='debt-free-backup-'+todayStr()+'.json';document.body.appendChild(a);a.click();
+  setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},500);toast('Backup downloaded ✓');
+}
+function loadExample(){
+  var t=new Date();function ago(days){var d=new Date(t.getFullYear(),t.getMonth(),t.getDate()-days);return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+  var s=defaultState();s.currency=state.currency;s.customSymbol=state.customSymbol;s.isExample=true;s.extraBudget=1500;s.strategy='avalanche';
+  s.debts=[
+    {id:'ex1',name:'Example: Credit card',original:28000,balance:18450,apr:18,minPayment:900,dueDay:25,color:COLORS[0]},
+    {id:'ex2',name:'Example: Car loan',original:120000,balance:76800,apr:4.5,minPayment:2600,dueDay:5,color:COLORS[1]},
+    {id:'ex3',name:'Example: Personal loan',original:40000,balance:22300,apr:9.8,minPayment:1200,dueDay:15,color:COLORS[2]},
+    {id:'ex4',name:'Example: Phone instalment',original:9600,balance:3200,apr:0,minPayment:400,dueDay:1,color:COLORS[3]}
+  ];
+  s.payments=[
+    {id:'p1',debtId:'ex1',date:ago(3),amount:2400,note:'Payday'},{id:'p2',debtId:'ex2',date:ago(10),amount:2600,note:''},
+    {id:'p3',debtId:'ex3',date:ago(18),amount:1200,note:''},{id:'p4',debtId:'ex4',date:ago(29),amount:400,note:''},
+    {id:'p5',debtId:'ex1',date:ago(34),amount:2400,note:'Bonus!'}
+  ];
+  state=normalize(s);save();render();toast('Example data loaded 🧪');
+}
+var toastT;function toast(msg){var t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(function(){t.classList.remove('show');},2600);}
+var rT;window.addEventListener('resize',function(){clearTimeout(rT);rT=setTimeout(function(){if(state.debts.length)renderWhatIf(simulate(state.debts,state.extraBudget,state.strategy),new Date());},150);});
+render();
+})();
+</script>
+</body>
+</html>
